@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/stack-vm-proto.iml" filepath="$PROJECT_DIR$/.idea/stack-vm-proto.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/stack-vm-test.iml" filepath="$PROJECT_DIR$/.idea/stack-vm-test.iml" />
     </modules>
   </component>
 </project>
