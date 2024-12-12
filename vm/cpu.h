@@ -25,6 +25,7 @@ private:
   uint32_t registers[REGISTER_COUNT];
 
   uint8_t* rom;
+  unsigned int rom_size;
 
   //Calculate the length of the instruction which includes the opcode and any operands. Used to advance the program counter
   uint32_t instruction_length;
@@ -47,7 +48,7 @@ private:
 public: 
   uint32_t pc;
   
-  CPU(uint8_t* r);
+  CPU(uint8_t* r, unsigned int);
 
   void step();
 

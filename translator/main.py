@@ -1,5 +1,8 @@
 
 import ast
+import visitor
+import symtable
+import symbols
 
 # Convert python like code into our assembly language
 # No stack variables, only registers
@@ -10,45 +13,57 @@ import ast
 
 # x = i * (a + b)
 
+s = """
 
+def main():
 
-n = ast.parse("""
+    LED_PIN = 13
+    
+    pinMode(LED_PIN, OUTPUT)
 
-b = 4
-
-a = square(b)
-
-uart_send(a)
-
-def square(x):
-    return x * x
+    while True:
+        digitalWrite(LED_PIN, HIGH)
+        delay(500)
+        digitalWrite(LED_PIN, LOW)
+        delay(500)
  
-""")
+"""
 
-t = """
+s = """
 
+def main():
+    a = something()
 
-    movi r26, 4     ; b = 4
-    
-    mov r6, r26     ; Load b as an argument
-    call @square     ; call square
-    mov r27, r6     ; Get the return value into a
-    
-    usr r27         ; uart_send(a)
-    
-    halt
-
-square:
-    push r26
-    
-    mov r26, r6     ; Load the argument into a local variable register
-    mul r26, r26
-    mov r6, r26     ; Put the result into a return value register
-    
-    pop r26
-    
-    ret
+def something():
+    return -4 << 77
 
 """
 
+s = """
+
+def main():
+    serialSend(~100 - 2)
+
+"""
+
+
+n = ast.parse(s)
+
+sym = symtable.symtable(s, "", "exec")
+
+map = symbols.get_map(s, n)
+print(map)
+
+print(sym.get_children())
+
+
+
 print(ast.dump(n, indent=4))
+
+tr = visitor.Translator(map)
+
+tr.visit(n)
+
+print(tr.code)
+
+print("\n".join(tr.code))

@@ -12,24 +12,32 @@ INSTRUCTION_OPCODES = {
     "or": 20,
     "xor": 21,
     "and": 22,
-    "one": 23,
+    "inv": 23,
     "neg": 24,
     "shl": 25,
     "shr": 26,
+    "bool": 27,
 
     # Control flow
     "jmp": 40,
     "alloc": 41,
     "call": 42,
     "ret": 43,
-
-
+    "eq": 44,
+    "ne": 45,
+    "gt": 46,
+    "lt": 47,
+    "ge": 48,
+    "le": 49,
+    "jt": 50,
+    "jf": 51,
 
     # Data transfer
     "pushi": 60,
     "popc": 61,
     "pushl": 62,
     "popl": 63,
+    "drop": 64,
 
     # GPIO
     "setup": 80,
@@ -41,9 +49,10 @@ INSTRUCTION_OPCODES = {
     "dlb": 101,
 
     # Misc
-    "halt": 250,
-    "ubw": 251,
-    "usr": 252,
+    "halt": 200,
+    "ubw": 201,
+    "speek": 202,
+    "spop": 203,
 }
 
 LABEL_IDENTIFIER = "(?P<name>[_a-z]([_0-9a-z])*)"
@@ -91,7 +100,7 @@ def process_tokens(tokens):
         elif INTEGER_REGEX.fullmatch(token) is not None:
             print(f"Number {INTEGER_REGEX.fullmatch(token).string}")
             i = int(INTEGER_REGEX.fullmatch(token).string)
-            b = i.to_bytes(4, 'little')
+            b = i.to_bytes(4, 'little', signed = True)
             bytecodes.extend(b)
             print(b)
         elif LABEL_OPERAND_REGEX.fullmatch(token) is not None:
@@ -141,10 +150,16 @@ def parse_source(source):
 
 
 source = """
-
+    call @main
+    halt
+main:
+    alloc 0
     pushi 100
-    write 13
-
+    inv 
+    pushi 2
+    sub 
+    spop 
+    ret 0
 """
 
 tokens = parse_source(source)
@@ -155,3 +170,4 @@ print(f"uint8_t t[{len(bytes)}] = {{", end='')
 for byte in bytes:
     print(f"{byte}, ", end='')
 print("};")
+

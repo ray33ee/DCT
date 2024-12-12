@@ -9,45 +9,39 @@ State:
 Machine state is defined as 64 64-bit registers and a stack
 
 - Math (0-19)
-	- ADD
-	- ADDI - Add immediate
-	- SUB 
-	- SUBI -Subtract immediate
-	- INC
-	- DEC
-	- MUL
-	- MULI - Multiply immediate
+	- ADD (0)
+	- SUB (1)
+	- MUL (2)
+	- RNG (3)
 - Bitwise Logic (20-39)
-	- OR 
-	- ORI - Or Immediate
+	- OR (20)
 	- XOR
-	- XORI - XOR immediate
 	- AND
-	- ANDI - And immediate
-	- ONE - One's complement
+	- INV - One's complement
 	- NEG - Two's Complement
 	- SHL - Shift left
 	- SHR - Shift right
+	- BOOL
+	- NOT 
 - Control flow (40-59)
-	- JMP
-	- JMPI
-	- CALL
-	- RET
-	- CMP
-	- CMPI - CMP immediate
-	- JE
-	- JNE
-	- JL
-	- JLE
-	- JG
-	- JGE
-	- JZ
-	- JNZ
+	- JMP (40)
+	- ALLOC (41)
+	- CALL (42)
+	- RET (43)
+	- EQ (44)
+	- NE (45)
+	- GT (46)
+	- LT (47)
+	- GE (48)
+	- LE (49)
+	- JT (50)
+	- JF (51)
 - Data transfer (60-79)
-	- MOV - Copy registers
-	- MOVI - Load immediate
-	- PUSH
-	- POP
+	- PUSHI
+	- POPC
+	- PUSHL
+	- POPL
+	- DROP
 - GPIO setup (80-99)
 	- SETUP - Setup pin 
 	- READ - Read pin
@@ -55,13 +49,12 @@ Machine state is defined as 64 64-bit registers and a stack
 - Timing (100-119)
 	- DLA - Milliseconds delay
 	- DLB - Microseconds delay
-	- DLAI - Milliseconds delay, immediate
-	- DLBI - Microseconds delay, immediate
 - USI (SPI, UART, I2C, 1-WIRE) (120-139)
 - Misc (200-250)
 	- HALT
 	- UBW - UART begin & wait
-	- USR - UART send register
+	- SPEEK - Serial send peek
+	- SPOP - Serial send pop
 	- RNG
 	- SEED
 

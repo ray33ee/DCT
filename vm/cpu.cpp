@@ -2,7 +2,7 @@
 #include "cpu.h"
 #include <Arduino.h>
 
-CPU::CPU(uint8_t* r): rom(r) {
+CPU::CPU(uint8_t* r, unsigned int len): rom(r), rom_size(len) {
   //Clear the stack
   for (int i = 0; i < CALL_STACK_SIZE; i++) 
     call_stack[i] = 0;
@@ -41,11 +41,16 @@ void CPU::advance_pc() {
 }
 
 void CPU::step() {
+
+  if (pc > rom_size) {
+    Serial.println("PC out of bounds");
+    while (1);
+  }
+
   //fetch
   uint8_t opcode = fetch();
 
   //decode & execute
-
   switch (opcode) {
     /* Math */
     case 0: {//ADD
@@ -55,6 +60,95 @@ void CPU::step() {
         advance_pc();
 
         break;
+    }
+    case 1: {//SUB
+        osp -= 1;
+        operand_stack[osp] = operand_stack[osp] - operand_stack[osp+1];
+
+        advance_pc();
+
+        break;
+    }
+    case 2: {//MUL
+        osp -= 1;
+        operand_stack[osp] = operand_stack[osp] * operand_stack[osp+1];
+
+        advance_pc();
+
+        break;
+    }
+	/* Bitwise Logic */
+    case 20: {//OR
+        osp -= 1;
+        operand_stack[osp] = operand_stack[osp] | operand_stack[osp+1];
+
+        advance_pc();
+
+        break;
+    }
+    case 21: {//XOR
+        osp -= 1;
+        operand_stack[osp] = operand_stack[osp] ^ operand_stack[osp+1];
+
+        advance_pc();
+
+        break;
+    }
+    case 22: {//AND
+        osp -= 1;
+        operand_stack[osp] = operand_stack[osp] & operand_stack[osp+1];
+
+        advance_pc();
+
+        break;
+    }
+    case 23: {//INV
+        operand_stack[osp] = ~operand_stack[osp];
+
+        advance_pc();
+
+        break;
+    }
+    case 24: {//NEG
+        operand_stack[osp] = -operand_stack[osp];
+
+        advance_pc();
+
+        break;
+    }
+    case 25: {//SHL
+        osp -= 1;
+        operand_stack[osp] = operand_stack[osp] << operand_stack[osp+1];
+
+        advance_pc();
+
+        break;
+    }
+    case 26: {//SHR
+        osp -= 1;
+        operand_stack[osp] = operand_stack[osp] >> operand_stack[osp+1];
+
+        advance_pc();
+
+        break;
+    }
+    case 27: {//BOOL
+		if (operand_stack[osp])
+			operand_stack[osp] = 1
+		
+		advance_pc();
+
+		break;
+    }
+    case 28: {//NOT
+		if (operand_stack[osp])
+			operand_stack[osp] = 0
+		else
+			operand_stack[osp] = 1
+		
+		advance_pc();
+
+		break;
     }
     /* Control Flow */
     case 40: {//JMP K
@@ -114,6 +208,90 @@ void CPU::step() {
 
       break;
     }
+    case 44: {//EQ
+        osp -= 1;
+        operand_stack[osp] = operand_stack[osp] == operand_stack[osp+1];
+
+        Serial.println(instruction_length);
+
+        advance_pc();
+
+        break;
+    }
+    case 45: {//NE
+        osp -= 1;
+        operand_stack[osp] = operand_stack[osp] != operand_stack[osp+1];
+
+        Serial.println(instruction_length);
+
+        advance_pc();
+
+        break;
+    }
+    case 46: {//GT
+        osp -= 1;
+        operand_stack[osp] = operand_stack[osp] > operand_stack[osp+1];
+
+        Serial.println(instruction_length);
+
+        advance_pc();
+
+        break;
+    }
+    case 47: {//LT
+        osp -= 1;
+        operand_stack[osp] = operand_stack[osp] < operand_stack[osp+1];
+
+        Serial.println(instruction_length);
+
+        advance_pc();
+
+        break;
+    }
+    case 48: {//GE
+        osp -= 1;
+        operand_stack[osp] = operand_stack[osp] >= operand_stack[osp+1];
+
+        Serial.println(instruction_length);
+
+        advance_pc();
+
+        break;
+    }
+    case 49: {//LE
+        osp -= 1;
+        operand_stack[osp] = operand_stack[osp] <= operand_stack[osp+1];
+
+        Serial.println(instruction_length);
+
+        advance_pc();
+
+        break;
+    }
+    case 50: {//JT K
+        uint32_t K = get_immediate();
+
+        if (operand_stack[osp] != 0)
+            pc = K;
+		else
+			advance_pc();
+
+		osp -= 1;
+
+        break;
+    }
+    case 51: {//JF K
+        uint32_t K = get_immediate();
+
+        if (operand_stack[osp] == 0)
+            pc = K;
+		else
+			advance_pc();
+
+		osp -= 1;
+
+        break;
+    }
     /* Data Transfer */
     case 60: {//PUSHI K
         uint32_t K = get_immediate();
@@ -158,44 +336,44 @@ void CPU::step() {
         advance_pc();
         break;
     }
+    case 64: {//DROP
+
+        osp -= 1;
+
+        advance_pc();
+        break;
+    }
 
     /* GPIO */
-    case 80: {//SETUP K, K
-      uint32_t pin_number = get_immediate();
-      uint32_t pin_mode = get_immediate();
+    case 80: {//SETUP
+		osp -= 2;
+		uint32_t pin_number = operand_stack[osp+1];
+		uint32_t pin_mode = operand_stack[osp+2];
 
-      if (pin_mode == PIN_INPUT) {
-        pinMode(pin_number, INPUT);
-      } else if (pin_mode == PIN_INPUT_PULLUP) {
-        pinMode(pin_number, INPUT_PULLUP);
-      }  else if (pin_mode == PIN_OUTPUT) {
-        pinMode(pin_number, OUTPUT);
-      } 
+		if (pin_mode == PIN_INPUT) {
+			pinMode(pin_number, INPUT);
+		} else if (pin_mode == PIN_INPUT_PULLUP) {
+			pinMode(pin_number, INPUT_PULLUP);
+		}  else if (pin_mode == PIN_OUTPUT) {
+			pinMode(pin_number, OUTPUT);
+		} 
+
+		advance_pc();
+
+		break;
+    }
+    case 81: {//READ
+      
+      operand_stack[osp] = digitalRead(operand_stack[osp]);
 
       advance_pc();
 
       break;
     }
-    case 81: {//READ K
-
-      uint32_t pin_number = get_immediate();
+    case 82: {//WRITE
       
-      osp += 1;
-      operand_stack[osp] = digitalRead(pin_number);
-
-
-      advance_pc();
-
-      break;
-    }
-    case 82: {//WRITE K
-
-      uint32_t pin_number = get_immediate();
-      
-
-
-      digitalWrite(pin_number, operand_stack[osp]);
       osp -= 1;
+      digitalWrite(operand_stack[osp], operand_stack[osp+1]);
 
       advance_pc();
 
@@ -221,7 +399,9 @@ void CPU::step() {
       break;
     }
     /* Misc */
-    case 250: {//HALT
+    case 200: {//HALT
+
+		Serial.println("Halting");
 
       while (1) {
         delay(1000);
@@ -229,7 +409,7 @@ void CPU::step() {
 
       break;
     }
-    case 251: {//UBW K
+    case 201: {//UBW K
       uint32_t K = get_immediate();
 
       //This instruction doesn't setup the serial properly idk why
@@ -241,7 +421,7 @@ void CPU::step() {
 
       break;
     }
-    case 252: {//USR
+    case 202: {//SPEEK
       uint32_t peek = operand_stack[osp];
 
       Serial.print("Peek: ");
@@ -252,8 +432,21 @@ void CPU::step() {
 
       break;
     }
+    case 203: {//SPOP
+      uint32_t top = operand_stack[osp];
+	  osp -= 1;
+
+      Serial.print("Pop: ");
+      Serial.print(top);
+      Serial.println();
+      
+      advance_pc();
+
+      break;
+    }
     default: {
-      Serial.println("Invalid command");
+      Serial.print("Invalid command - ");
+      Serial.println(opcode);
 
       break;
     }

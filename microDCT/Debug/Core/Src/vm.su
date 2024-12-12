@@ -1,0 +1,5 @@
+../Core/Src/vm.c:10:9:__vm_fetch	16	static
+../Core/Src/vm.c:15:6:advance_pc	16	static
+../Core/Src/vm.c:19:10:get_immediate	24	static
+../Core/Src/vm.c:26:6:vm_init	24	static
+../Core/Src/vm.c:50:6:vm_execute	72	static

@@ -1,0 +1,5 @@
+../Core/Src/vm.c:10:9:__vm_fetch	1
+../Core/Src/vm.c:15:6:advance_pc	1
+../Core/Src/vm.c:19:10:get_immediate	1
+../Core/Src/vm.c:26:6:vm_init	1
+../Core/Src/vm.c:50:6:vm_execute	38
