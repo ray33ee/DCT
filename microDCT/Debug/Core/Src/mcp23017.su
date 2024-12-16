@@ -1,2 +1,2 @@
 ../Core/Src/mcp23017.c:11:6:mcp23017_init	32	static
-../Core/Src/mcp23017.c:28:6:mcp23017_gpio	24	static
+../Core/Src/mcp23017.c:26:6:mcp23017_gpio	24	static

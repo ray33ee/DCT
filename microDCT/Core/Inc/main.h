@@ -34,6 +34,8 @@ extern "C" {
 
 #include "vm.h"
 #include "pp.h"
+#include "rng.h"
+#include "soft_i2c.h"
 
 /* USER CODE END Includes */
 

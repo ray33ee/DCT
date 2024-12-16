@@ -81,6 +81,14 @@ void vm_execute(struct VM_State* state) {
 
 	        break;
 	    }
+	    case 3: {//RNG
+	        state->osp += 1;
+	        state->operand_stack[state->osp] = rng_global_next32();
+
+	        advance_pc(state);
+
+	        break;
+	    }
 	    /* Bitwise Logic */
 	    case 20: {//OR
 	        state->osp -= 1;
@@ -337,6 +345,14 @@ void vm_execute(struct VM_State* state) {
 	    }
 
 	    /* GPIO */
+	    case 81: {//READ
+
+	    	break;
+	    }
+	    case 82: {//WRITE
+
+	    	break;
+	    }
 	    /* Timing */
 	    case 100: {//DLA
 

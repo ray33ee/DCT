@@ -52,11 +52,8 @@ Machine state is defined as 64 64-bit registers and a stack
 - USI (SPI, UART, I2C, 1-WIRE) (120-139)
 - Misc (200-250)
 	- HALT
-	- UBW - UART begin & wait
 	- SPEEK - Serial send peek
 	- SPOP - Serial send pop
-	- RNG
-	- SEED
 
 Bytecode:
 

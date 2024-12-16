@@ -45,7 +45,10 @@ ADC_HandleTypeDef hadc5;
 
 I2C_HandleTypeDef hi2c1;
 
+RNG_HandleTypeDef hrng;
+
 TIM_HandleTypeDef htim2;
+TIM_HandleTypeDef htim3;
 
 UART_HandleTypeDef huart2;
 
@@ -61,6 +64,8 @@ static void MX_USART2_UART_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_ADC2_Init(void);
 static void MX_ADC5_Init(void);
+static void MX_RNG_Init(void);
+static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -68,42 +73,7 @@ static void MX_ADC5_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-#ifdef __GNUC__
-#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-#else
-#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-#endif
 
-PUTCHAR_PROTOTYPE
-{
-  HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
-  return ch;
-}
-
-uint32_t read_uart_into_buffer(uint8_t* buffer, uint32_t buffer_size, uint8_t stop_character) {
-	//Keep reading into the until either a) the stop character is reached or b) we run out of buffer space
-	uint32_t count = 0;
-
-	while (1) {
-
-
-		if (count >= buffer_size) {
-			return -1;
-		}
-
-		__HAL_UART_CLEAR_OREFLAG(&huart2);
-
-		HAL_UART_Receive(&huart2, buffer + count, 1, HAL_MAX_DELAY);
-		HAL_UART_Transmit(&huart2, buffer + count, 1, HAL_MAX_DELAY);
-
-		if (buffer[count] == stop_character) {
-			buffer[count] = '\0';
-			return count+1;
-		}
-
-		count += 1;
-	}
-}
 
 struct VM_State vm_state;
 
@@ -143,7 +113,11 @@ int main(void)
   MX_I2C1_Init();
   MX_ADC2_Init();
   MX_ADC5_Init();
+  MX_RNG_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+
+  HAL_TIM_Base_Start(&htim3);
 
   const uint32_t call_stack_size = 100;
   const uint32_t operand_stack_size = 100;
@@ -151,11 +125,62 @@ int main(void)
   uint32_t call_stack[call_stack_size];
   uint32_t operand_stack[operand_stack_size];
 
+  uint8_t buff[100];
+
+  buff[0] = 0xf6;
+
   uint8_t rom[29] = {42, 6, 0, 0, 0, 200, 41, 0, 0, 0, 0, 60, 100, 0, 0, 0, 23, 60, 2, 0, 0, 0, 1, 203, 43, 0, 0, 0, 0, };
 
   vm_init(&vm_state, call_stack, operand_stack, call_stack_size, operand_stack_size, rom, sizeof(rom));
 
   printf("POinter size: %i\n", sizeof(void*));
+
+  rng_global_init();
+
+  printf("rng: %i\n", rng_global_next32());
+  printf("rng: %i\n", rng_global_next32());
+  printf("rng: %i\n", rng_global_next32());
+  printf("rng: %i\n", rng_global_next32());
+
+  struct SOFT_I2C_HANDLE h2i2c;
+
+  soft_i2c_init(&h2i2c, GPIOA, GPIO_PIN_10, GPIOC, GPIO_PIN_4, 10, 4);
+
+  uint8_t who_am_i = 0x4F;
+
+  //soft_i2c_start(&h2i2c);
+
+  int r = soft_i2c_transmit(&h2i2c, 0x3c, &who_am_i, 1);
+
+  int r1 = soft_i2c_receive(&h2i2c, 0x3c, &who_am_i, 1);
+
+  printf("Soft i2c %i\n", who_am_i);
+
+
+  /*soft_i2c_start(&h2i2c);
+
+  soft_i2c_transmit_byte(&h2i2c, 0x3d);
+
+  uint8_t b = soft_i2c_receive_byte(&h2i2c, GPIO_PIN_SET);
+
+  soft_i2c_stop(&h2i2c);
+
+  printf("i2c: %i\n", r);
+  printf("i2c: %i\n", b);*/
+
+  HAL_StatusTypeDef reta = HAL_I2C_Master_Transmit(&hi2c1, 0x3c, &who_am_i, 1, 10);
+
+  HAL_StatusTypeDef retb = HAL_I2C_Master_Receive(&hi2c1, 0x3d, &who_am_i, 1, 10);
+
+
+
+  printf("main i2c: %i\n", reta);
+  printf("main i2c: %i\n", retb);
+  printf("whoami: %i\n", who_am_i);
+
+
+  //HAL_StatusTypeDef res = HAL_I2C_Master_Transmit(&hi2c1, 180, buff, 1, 10);
+
 
   /* USER CODE END 2 */
 
@@ -167,7 +192,17 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  vm_execute(&vm_state);
+	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
+
+	  //misc_delay_us(2);
+
+	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
+
+	  //misc_delay_us(2);
+
+	  //vm_execute(&vm_state);
+
+
   }
   /* USER CODE END 3 */
 }
@@ -183,7 +218,7 @@ void SystemClock_Config(void)
 
   /** Configure the main internal regulator output voltage
   */
-  HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1_BOOST);
+  HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -193,10 +228,10 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV4;
-  RCC_OscInitStruct.PLL.PLLN = 85;
+  RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV1;
+  RCC_OscInitStruct.PLL.PLLN = 12;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV4;
   RCC_OscInitStruct.PLL.PLLR = RCC_PLLR_DIV2;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -212,7 +247,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
   {
     Error_Handler();
   }
@@ -239,7 +274,7 @@ static void MX_ADC2_Init(void)
   /** Common config
   */
   hadc2.Instance = ADC2;
-  hadc2.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc2.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
   hadc2.Init.Resolution = ADC_RESOLUTION_12B;
   hadc2.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc2.Init.GainCompensation = 0;
@@ -298,7 +333,7 @@ static void MX_ADC5_Init(void)
   /** Common config
   */
   hadc5.Instance = ADC5;
-  hadc5.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc5.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
   hadc5.Init.Resolution = ADC_RESOLUTION_12B;
   hadc5.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc5.Init.GainCompensation = 0;
@@ -352,7 +387,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x40B285C2;
+  hi2c1.Init.Timing = 0x20B17DB6;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -381,6 +416,33 @@ static void MX_I2C1_Init(void)
   /* USER CODE BEGIN I2C1_Init 2 */
 
   /* USER CODE END I2C1_Init 2 */
+
+}
+
+/**
+  * @brief RNG Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_RNG_Init(void)
+{
+
+  /* USER CODE BEGIN RNG_Init 0 */
+
+  /* USER CODE END RNG_Init 0 */
+
+  /* USER CODE BEGIN RNG_Init 1 */
+
+  /* USER CODE END RNG_Init 1 */
+  hrng.Instance = RNG;
+  hrng.Init.ClockErrorDetection = RNG_CED_ENABLE;
+  if (HAL_RNG_Init(&hrng) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN RNG_Init 2 */
+
+  /* USER CODE END RNG_Init 2 */
 
 }
 
@@ -440,6 +502,51 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 2 */
   HAL_TIM_MspPostInit(&htim2);
+
+}
+
+/**
+  * @brief TIM3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM3_Init(void)
+{
+
+  /* USER CODE BEGIN TIM3_Init 0 */
+
+  /* USER CODE END TIM3_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM3_Init 1 */
+
+  /* USER CODE END TIM3_Init 1 */
+  htim3.Instance = TIM3;
+  htim3.Init.Prescaler = 96-1;
+  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim3.Init.Period = 65535;
+  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM3_Init 2 */
+
+  /* USER CODE END TIM3_Init 2 */
 
 }
 

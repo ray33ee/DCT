@@ -4579,6 +4579,10 @@
 		(uuid "1b82d69e-07a6-48db-8787-c79f6e97152e")
 	)
 	(no_connect
+		(at 110.49 127)
+		(uuid "2364badc-9f6d-4f53-bb72-ff18dc7e46c6")
+	)
+	(no_connect
 		(at 105.41 74.93)
 		(uuid "27ca5b24-24d3-4394-8479-9e435030e409")
 	)
@@ -4599,12 +4603,20 @@
 		(uuid "36451c8c-c8b3-44f5-8708-1d814dd85d03")
 	)
 	(no_connect
+		(at 97.79 109.22)
+		(uuid "3abd1813-1f8b-415f-b238-9e1d529db21d")
+	)
+	(no_connect
 		(at 161.29 52.07)
 		(uuid "3c4f41c1-9e3d-4243-901d-a70855a94ae2")
 	)
 	(no_connect
 		(at 105.41 82.55)
 		(uuid "3fff5a46-ee8b-4514-b77e-3fe90c282158")
+	)
+	(no_connect
+		(at 95.25 121.92)
+		(uuid "49fcf741-51c2-443d-a3fc-0760cf6f1b13")
 	)
 	(no_connect
 		(at 151.13 74.93)
@@ -4685,6 +4697,10 @@
 	(no_connect
 		(at 55.88 175.26)
 		(uuid "b152b3ce-f170-4396-b551-d75907895655")
+	)
+	(no_connect
+		(at 123.19 109.22)
+		(uuid "b76df8b3-d343-40ee-a2d8-a1f37d5fea99")
 	)
 	(no_connect
 		(at 55.88 172.72)
@@ -9066,6 +9082,74 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 101.6 109.22 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "076ed2dc-42a8-4cce-a444-ff0eb9c2ed4f")
+		(property "Reference" "R107"
+			(at 101.6 102.87 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "R"
+			(at 101.6 105.41 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
+			(at 101.6 110.998 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 101.6 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 101.6 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "4ed64ee5-a254-4e73-aaf8-6b4c895f1fbd")
+		)
+		(pin "1"
+			(uuid "a0091668-5bdb-4274-95a9-76b7334e4f16")
+		)
+		(instances
+			(project ""
+				(path "/52539f95-d548-4655-9e18-36fe1dde0b74"
+					(reference "R107")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:+3V3")
 		(at 38.1 149.86 0)
 		(unit 1)
@@ -9412,6 +9496,81 @@
 		)
 	)
 	(symbol
+		(lib_id "Transistor_FET:IRF4905")
+		(at 110.49 111.76 270)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "26342fb7-4982-4fe0-9176-be1f7c4fdc7a")
+		(property "Reference" "Q67"
+			(at 110.49 102.87 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "CJ2301"
+			(at 110.49 105.41 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
+			(at 108.585 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "http://www.infineon.com/dgdl/irf4905.pdf?fileId=5546d462533600a4015355e32165197c"
+			(at 106.68 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Description" "-74A Id, -55V Vds, Single P-Channel HEXFET Power MOSFET, 20mOhm Ron, TO-220AB"
+			(at 110.49 111.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "8d1f33ae-1035-45f6-b259-20f02cfe9d4a")
+		)
+		(pin "3"
+			(uuid "2d7fe20c-c1d2-4bad-bba9-234c52c18299")
+		)
+		(pin "1"
+			(uuid "4472a123-11f6-4b71-bcb5-78f60b9554de")
+		)
+		(instances
+			(project "micro"
+				(path "/52539f95-d548-4655-9e18-36fe1dde0b74"
+					(reference "Q67")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:C_Polarized")
 		(at 233.68 46.99 0)
 		(unit 1)
@@ -9719,6 +9878,73 @@
 			(project "micro"
 				(path "/52539f95-d548-4655-9e18-36fe1dde0b74"
 					(reference "C1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 99.06 121.92 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "37f67f35-9e13-439b-9f5c-c822fba06516")
+		(property "Reference" "R109"
+			(at 99.06 128.27 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "2k2"
+			(at 99.06 125.73 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
+			(at 99.06 120.142 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 99.06 121.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 99.06 121.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "03359a7a-cba8-4126-a33c-df14058a7770")
+		)
+		(pin "2"
+			(uuid "b90dddb2-0691-4411-be37-a8615f72400b")
+		)
+		(instances
+			(project "micro"
+				(path "/52539f95-d548-4655-9e18-36fe1dde0b74"
+					(reference "R109")
 					(unit 1)
 				)
 			)
@@ -11624,6 +11850,74 @@
 	)
 	(symbol
 		(lib_id "Device:R")
+		(at 119.38 109.22 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "a993b3a3-e711-4431-befe-de34f2d65d5e")
+		(property "Reference" "R108"
+			(at 119.38 102.87 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "R"
+			(at 119.38 105.41 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder"
+			(at 119.38 110.998 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 119.38 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 119.38 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "61a906bc-cbb5-42f4-97a6-3f37115cb77d")
+		)
+		(pin "1"
+			(uuid "c5471cf7-e10c-462b-8688-fa275c2f302f")
+		)
+		(instances
+			(project "micro"
+				(path "/52539f95-d548-4655-9e18-36fe1dde0b74"
+					(reference "R108")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
 		(at 38.1 156.21 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -12244,6 +12538,82 @@
 			(project ""
 				(path "/52539f95-d548-4655-9e18-36fe1dde0b74"
 					(reference "U2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Transistor_BJT:PMBT2222A")
+		(at 107.95 121.92 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "ee771c88-9e4e-4c9e-9858-6301423354f4")
+		(property "Reference" "Q68"
+			(at 113.03 120.6499 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "PMBT2222A"
+			(at 113.03 123.1899 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
+			(at 113.03 123.825 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+					(italic yes)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://assets.nexperia.com/documents/data-sheet/PMBT2222A.pdf"
+			(at 107.95 121.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Description" "600mA Ic, 40V Vce, NPN Transistor, SOT-23"
+			(at 107.95 121.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "f8716e67-7cf4-4df5-bac8-6e930170a983")
+		)
+		(pin "2"
+			(uuid "e83130ac-91cb-4835-9710-5931eddd2935")
+		)
+		(pin "3"
+			(uuid "72d078e6-9483-4898-8ad8-71dc1b0c27fe")
+		)
+		(instances
+			(project "micro"
+				(path "/52539f95-d548-4655-9e18-36fe1dde0b74"
+					(reference "Q68")
 					(unit 1)
 				)
 			)

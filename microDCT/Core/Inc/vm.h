@@ -10,6 +10,7 @@
 
 #include "stdint.h"
 #include "stm32g4xx_hal.h"
+#include "rng.h"
 
 #define BYTECODE_OPCODE_LEN (1)
 #define BYTECODE_IMMEDIATE_LEN (4)

@@ -1,0 +1,2 @@
+../Core/Src/uart.c:18:1:__io_putchar	16	static
+../Core/Src/uart.c:24:10:read_uart_into_buffer	32	static
