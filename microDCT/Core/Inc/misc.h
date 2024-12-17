@@ -8,7 +8,7 @@
 #ifndef INC_MISC_H_
 #define INC_MISC_H_
 
-#include "main.h"
+#include "stm32g4xx_hal.h"
 #include <stdint.h>
 
 

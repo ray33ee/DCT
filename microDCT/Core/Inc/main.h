@@ -36,6 +36,9 @@ extern "C" {
 #include "pp.h"
 #include "rng.h"
 #include "soft_i2c.h"
+#include "psu.h"
+#include "uart.h"
+#include <stdio.h>
 
 /* USER CODE END Includes */
 

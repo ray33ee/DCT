@@ -12,8 +12,8 @@
 struct RNG_State GLOBAL_RNG_STATE;
 
 /* Initialise the rng state with a seed from the RNG peripheral */
-void rng_global_init() {
-	if (HAL_RNG_GenerateRandomNumber(&hrng, &(GLOBAL_RNG_STATE._state)) != HAL_OK) {
+void rng_global_init(RNG_HandleTypeDef* _hrng) {
+	if (HAL_RNG_GenerateRandomNumber(_hrng, &(GLOBAL_RNG_STATE._state)) != HAL_OK) {
 		//error
 	}
 

@@ -29,7 +29,7 @@ void soft_i2c_init(struct SOFT_I2C_HANDLE* i2c_handle, GPIO_TypeDef *sda_port, u
 
 	uint32_t temp;
 
-	/* Configure SDA as High frequency, no-pullup output open drain
+	/* Configure SDA as High frequency, no-pullup output open drain */
 
 	/* Configure the IO Speed */
 	temp = sda_port->OSPEEDR;
@@ -49,7 +49,7 @@ void soft_i2c_init(struct SOFT_I2C_HANDLE* i2c_handle, GPIO_TypeDef *sda_port, u
 	temp |= ((GPIO_NOPULL) << (sda_pos * 2U));
 	sda_port->PUPDR = temp;
 
-	/* Configure SCL as High frequency, no-pullup output open drain
+	/* Configure SCL as High frequency, no-pullup output open drain */
 
 	/* Configure the IO Speed */
 	temp = scl_port->OSPEEDR;
@@ -156,7 +156,7 @@ int soft_i2c_receive(struct SOFT_I2C_HANDLE* i2c_handle, uint8_t address, uint8_
 	soft_i2c_stop(i2c_handle);
 
 
-
+	return 0;
 
 }
 

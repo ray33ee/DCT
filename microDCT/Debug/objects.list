@@ -2,6 +2,7 @@
 "./Core/Src/mcp23017.o"
 "./Core/Src/misc.o"
 "./Core/Src/pp.o"
+"./Core/Src/psu.o"
 "./Core/Src/rng.o"
 "./Core/Src/soft_i2c.o"
 "./Core/Src/stm32g4xx_hal_msp.o"

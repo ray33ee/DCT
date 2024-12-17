@@ -1,4 +1,4 @@
 ../Core/Src/pp.c:39:6:pp_init	1
-../Core/Src/pp.c:53:6:pp_setup	5
-../Core/Src/pp.c:107:6:pp_write	1
-../Core/Src/pp.c:115:15:pp_read	1
+../Core/Src/pp.c:55:6:pp_setup	5
+../Core/Src/pp.c:109:6:pp_write	1
+../Core/Src/pp.c:117:15:pp_read	1

@@ -36,21 +36,23 @@ const uint32_t GS_HVS_SELECT_MAP[] = {
 };
 
 /* Setup MCP expanders and set all STM GPIO to inputs */
-void pp_init() {
+void pp_init(struct PP_HANDLE* pp_handle, I2C_HandleTypeDef* hi2c) {
+
+
 
 	//Setup both MCP devices
-	mcp23017_init(MCP_U2_ADDR);
-	mcp23017_init(MCP_U3_ADDR);
+	mcp23017_init(&pp_handle->u2_handle, MCP_U2_ADDR, hi2c);
+	mcp23017_init(&pp_handle->u3_handle, MCP_U3_ADDR, hi2c);
 
 	//On startup, setup the device as though all pins are not connected. I.e. VCC off, GND off and STM GPIO as inputs
 	enum PIN_STATUS not_connected[] = {NC, NC, NC, NC, NC, NC, NC, NC, NC, NC, NC, NC, NC, NC, NC, NC, };
 
-	pp_setup(not_connected);
+	pp_setup(pp_handle, not_connected);
 
 }
 
 /* Setup all physical pins as either input, output, vcc or gnd according to pin_configs */
-void pp_setup(enum PIN_STATUS* pin_configs) {
+void pp_setup(struct PP_HANDLE* pp_handle, enum PIN_STATUS* pin_configs) {
 	//Loop over all 16 pins
 	//Extract relevant information via 'GS_HVS_SELECT_MAP'
 	//Setup GS and HVS bits
@@ -98,8 +100,8 @@ void pp_setup(enum PIN_STATUS* pin_configs) {
 	}
 
 	/* Write mcp_gpio_registers to MCP devices */
-	mcp23017_gpio(MCP_U2_ADDR, mcp_gpio_registers[0]);
-	mcp23017_gpio(MCP_U3_ADDR, mcp_gpio_registers[1]);
+	mcp23017_gpio(&pp_handle->u2_handle, MCP_U2_ADDR, mcp_gpio_registers[0]);
+	mcp23017_gpio(&pp_handle->u2_handle, MCP_U3_ADDR, mcp_gpio_registers[1]);
 
 }
 

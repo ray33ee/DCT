@@ -61,7 +61,7 @@ main-build: microDCT.elf secondary-outputs
 
 # Tool invocations
 microDCT.elf microDCT.map: $(OBJS) $(USER_OBJS) E:\Software\ Projects\DCT\microDCT\STM32G474RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "microDCT.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"E:\Software Projects\DCT\microDCT\STM32G474RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="microDCT.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "microDCT.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"E:\Software Projects\DCT\microDCT\STM32G474RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="microDCT.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -8,7 +8,7 @@
 #ifndef INC_SOFT_I2C_H_
 #define INC_SOFT_I2C_H_
 
-#include "main.h"
+#include "stdio.h"
 #include "stm32g4xx_hal.h"
 
 struct SOFT_I2C_HANDLE {

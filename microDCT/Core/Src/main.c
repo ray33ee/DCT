@@ -77,6 +77,62 @@ static void MX_TIM3_Init(void);
 
 struct VM_State vm_state;
 
+uint32_t shunt_okay_average(struct PSU_STATE* psu_state) {
+	uint32_t sum = 0;
+
+	const uint32_t size = 5;
+
+	uint32_t set[size];
+
+	for (int j = 0; j < size; j++) {
+		set[j] = psu_shunt_diff(psu_state);
+	  //printf("value: %i\n", set[j]);
+	  sum += set[j];
+	}
+
+	//printf("cumulative: %i\n", sum);
+
+	uint32_t mean = sum / size;
+
+	sum=0;
+
+	//printf("mean: %i\n", mean);
+
+	for (int j = 0; j < size; j++) {
+	  uint32_t diff = set[j] - mean;
+	  //printf("diff: %i\n", diff);
+	  sum += diff < 0 ? -diff : diff;
+	}
+
+	uint32_t dev = sum / size;
+
+	//printf("dev: %i\n", dev);
+
+	uint32_t lower = mean - 3 * dev - 1;
+	uint32_t upper = mean + 3 * dev + 1;
+
+	//printf("lower: %i\n", lower);
+
+	//printf("upper: %i\n", upper);
+
+	sum=0;
+
+	uint32_t count = 0;
+	for (int j = 0; j < size; j++) {
+	  if (set[j] > lower-1 && set[j] <= upper+1) {
+		  sum += set[j];
+		  count++;
+	  }
+
+	}
+
+	if (sum == 0) {
+		return mean;
+	} else {
+		return sum / count;
+	}
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -117,7 +173,12 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
+  //Timer 3 is used in misc_delay_us
   HAL_TIM_Base_Start(&htim3);
+
+  uint8_t buff[100];
+
+  /* Setup VM */
 
   const uint32_t call_stack_size = 100;
   const uint32_t operand_stack_size = 100;
@@ -125,22 +186,25 @@ int main(void)
   uint32_t call_stack[call_stack_size];
   uint32_t operand_stack[operand_stack_size];
 
-  uint8_t buff[100];
-
-  buff[0] = 0xf6;
-
   uint8_t rom[29] = {42, 6, 0, 0, 0, 200, 41, 0, 0, 0, 0, 60, 100, 0, 0, 0, 23, 60, 2, 0, 0, 0, 1, 203, 43, 0, 0, 0, 0, };
 
   vm_init(&vm_state, call_stack, operand_stack, call_stack_size, operand_stack_size, rom, sizeof(rom));
 
-  printf("POinter size: %i\n", sizeof(void*));
+  /* Setup and test RNG */
 
-  rng_global_init();
+  rng_global_init(&hrng);
 
-  printf("rng: %i\n", rng_global_next32());
-  printf("rng: %i\n", rng_global_next32());
-  printf("rng: %i\n", rng_global_next32());
-  printf("rng: %i\n", rng_global_next32());
+  printf("rng: %u\n", (unsigned int)rng_global_next32());
+  printf("rng: %u\n", (unsigned int)rng_global_next32());
+  printf("rng: %u\n", (unsigned int)rng_global_next32());
+  printf("rng: %u\n", (unsigned int)rng_global_next32());
+
+  /* Setup and test soft I2C */
+
+  /*
+  uint8_t buff[100];
+
+  buff[0] = 0xf6;
 
   struct SOFT_I2C_HANDLE h2i2c;
 
@@ -148,39 +212,27 @@ int main(void)
 
   uint8_t who_am_i = 0x4F;
 
-  //soft_i2c_start(&h2i2c);
-
   int r = soft_i2c_transmit(&h2i2c, 0x3c, &who_am_i, 1);
 
   int r1 = soft_i2c_receive(&h2i2c, 0x3c, &who_am_i, 1);
 
-  printf("Soft i2c %i\n", who_am_i);
+  printf("Soft i2c %i\n", who_am_i);*/
 
+  /* Test hard I2C */
 
-  /*soft_i2c_start(&h2i2c);
-
-  soft_i2c_transmit_byte(&h2i2c, 0x3d);
-
-  uint8_t b = soft_i2c_receive_byte(&h2i2c, GPIO_PIN_SET);
-
-  soft_i2c_stop(&h2i2c);
-
-  printf("i2c: %i\n", r);
-  printf("i2c: %i\n", b);*/
-
-  HAL_StatusTypeDef reta = HAL_I2C_Master_Transmit(&hi2c1, 0x3c, &who_am_i, 1, 10);
+  /*HAL_StatusTypeDef reta = HAL_I2C_Master_Transmit(&hi2c1, 0x3c, &who_am_i, 1, 10);
 
   HAL_StatusTypeDef retb = HAL_I2C_Master_Receive(&hi2c1, 0x3d, &who_am_i, 1, 10);
 
-
-
   printf("main i2c: %i\n", reta);
   printf("main i2c: %i\n", retb);
-  printf("whoami: %i\n", who_am_i);
+  printf("whoami: %i\n", who_am_i);*/
 
+  struct PSU_STATE psu_state;
 
-  //HAL_StatusTypeDef res = HAL_I2C_Master_Transmit(&hi2c1, 180, buff, 1, 10);
+  psu_init(&psu_state, &hadc2, &hadc5, &htim2, &TIM2->CCR1, TIM_CHANNEL_1);
 
+  uint32_t values[1600];
 
   /* USER CODE END 2 */
 
@@ -192,15 +244,33 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET);
-
-	  //misc_delay_us(2);
-
-	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET);
-
-	  //misc_delay_us(2);
-
 	  //vm_execute(&vm_state);
+
+	  printf("Enter pwm: \n");
+
+	  read_uart_into_buffer(buff, 100, '\n');
+
+	  //psu_intensity(&psu_state, atoi(buff));
+
+	  //printf("drop: %i\n", psu_shunt_diff(&psu_state));
+
+	  for (int i = 0; i < 1600; i++) {
+		  psu_intensity(&psu_state, i);
+
+		  HAL_Delay(1);
+
+
+
+		  //printf("value: %i\n", value);
+
+		  values[i] = shunt_okay_average(&psu_state); //psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state);
+
+	  }
+
+	  for (int i = 0; i < 1600; i++) {
+		  printf("%i\n", values[i]);
+
+	  }
 
 
   }
@@ -274,7 +344,7 @@ static void MX_ADC2_Init(void)
   /** Common config
   */
   hadc2.Instance = ADC2;
-  hadc2.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
+  hadc2.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV256;
   hadc2.Init.Resolution = ADC_RESOLUTION_12B;
   hadc2.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc2.Init.GainCompensation = 0;
@@ -296,7 +366,7 @@ static void MX_ADC2_Init(void)
 
   /** Configure Regular Channel
   */
-  sConfig.Channel = ADC_CHANNEL_3;
+  sConfig.Channel = ADC_CHANNEL_1;
   sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
   sConfig.SingleDiff = ADC_DIFFERENTIAL_ENDED;
@@ -333,7 +403,7 @@ static void MX_ADC5_Init(void)
   /** Common config
   */
   hadc5.Instance = ADC5;
-  hadc5.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
+  hadc5.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV256;
   hadc5.Init.Resolution = ADC_RESOLUTION_12B;
   hadc5.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc5.Init.GainCompensation = 0;
@@ -468,7 +538,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 0;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 3333;
+  htim2.Init.Period = 1600;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)

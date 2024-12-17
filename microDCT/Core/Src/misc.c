@@ -7,6 +7,7 @@
 
 #include "misc.h"
 
+
 void misc_delay_us(uint16_t us)
 {
 	__HAL_TIM_SET_COUNTER(&htim3,0);  // set the counter value a 0

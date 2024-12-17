@@ -377,7 +377,7 @@ void vm_execute(struct VM_State* state) {
 	    case 202: {//SPEEK
 	      uint32_t peek = state->operand_stack[state->osp];
 
-	      printf("Peek: %i\n", peek);
+	      printf("Peek: %i\n", (int)peek);
 
 	      advance_pc(state);
 
@@ -387,14 +387,14 @@ void vm_execute(struct VM_State* state) {
 	      uint32_t top = state->operand_stack[state->osp];
 	      state->osp -= 1;
 
-	      printf("Pop: %i\n", top);
+	      printf("Pop: %i\n", (int)top);
 
 	      advance_pc(state);
 
 	      break;
 	    }
 	    default: {
-	    	printf("Invalid command - (%i)\n", opcode);
+	    	printf("Invalid command - (%i)\n", (int)opcode);
 
 	      break;
 	    }

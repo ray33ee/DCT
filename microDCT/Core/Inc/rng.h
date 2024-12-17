@@ -8,15 +8,14 @@
 #ifndef INC_RNG_H_
 #define INC_RNG_H_
 
-#include "main.h"
-
-extern RNG_HandleTypeDef hrng;
+#include "stm32g4xx_hal.h"
 
 struct RNG_State {
 	uint32_t _state;
+	RNG_HandleTypeDef* hrng;
 };
 
-void rng_global_init();
+void rng_global_init(RNG_HandleTypeDef*);
 
 void rng_global_seed(uint32_t);
 

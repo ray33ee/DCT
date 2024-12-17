@@ -1,0 +1,6 @@
+../Core/Src/psu.c:12:6:psu_init	1
+../Core/Src/psu.c:36:6:psu_intensity	1
+../Core/Src/psu.c:40:10:psu_generic_read	1
+../Core/Src/psu.c:50:10:psu_output_voltage	1
+../Core/Src/psu.c:55:10:psu_shunt_diff	1
+../Core/Src/psu.c:62:7:convert_adc_to_voltage	1
