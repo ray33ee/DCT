@@ -40,8 +40,6 @@ const uint32_t GS_HVS_SELECT_MAP[] = {
 /* Setup MCP expanders and set all STM GPIO to inputs */
 void pp_init(struct PP_HANDLE* pp_handle, I2C_HandleTypeDef* hi2c) {
 
-
-
 	//Setup both MCP devices
 	mcp23017_init(&pp_handle->u2_handle, MCP_U2_ADDR, hi2c);
 	mcp23017_init(&pp_handle->u3_handle, MCP_U3_ADDR, hi2c);

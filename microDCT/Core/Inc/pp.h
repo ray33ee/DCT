@@ -15,19 +15,17 @@
 
 #define PP_COUNT (16)
 
-enum PIN_STATUS {
-	NC,
-	INPUT,
-	OUTPUT,
-	VCC,
-	GND,
-};
+#define NC		(0)
+#define INPUT	(1)
+#define OUTPUT	(2)
+#define VCC		(3)
+#define GND		(4)
 
 struct PP_HANDLE {
 	MCP23017_HANDLE_TD u2_handle;
 	MCP23017_HANDLE_TD u3_handle;
 
-	enum PIN_STATUS pin_configs[PP_COUNT];
+	uint8_t pin_configs[PP_COUNT];
 };
 
 void pp_init(struct PP_HANDLE*, I2C_HandleTypeDef*);

@@ -99,6 +99,19 @@ uint32_t vm_execute(struct VM_State* state) {
 
 	        break;
 	    }
+	    case 4: {//SEED
+
+	    	uint32_t seed = state->operand_stack[state->osp];
+
+	        state->osp -= 1;
+
+	    	rng_global_seed(seed);
+
+	        advance_pc(state);
+
+	    	break;
+
+	    }
 	    /* Bitwise Logic */
 	    case 20: {//OR
 	        state->osp -= 1;
@@ -374,16 +387,6 @@ uint32_t vm_execute(struct VM_State* state) {
 	      break;
 	    }
 	    /* Misc */
-	    case 200: {//HALT
-
-	        //printf("Halting\n");
-
-	      while (1) {
-	        HAL_Delay(1000);
-	      }
-
-	      break;
-	    }
 	    case 201: {//SUC
 
 	    	return SUCCESS;

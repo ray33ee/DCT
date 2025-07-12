@@ -77,6 +77,7 @@ static void MX_TIM3_Init(void);
 struct Executable_State exec_state;
 struct VM_State vm_state;
 struct PSU_STATE psu_state;
+struct PP_HANDLE pp_state;
 
 uint32_t shunt_okay_average(struct PSU_STATE* psu_state) {
 	uint32_t sum = 0;
@@ -179,6 +180,10 @@ int main(void)
 
   uint8_t buff[100];
 
+  /* Setup PP */
+
+  pp_init(&pp_state, &hi2c1);
+
   /* Setup VM */
 
   const uint32_t call_stack_size = 100;
@@ -263,6 +268,15 @@ int main(void)
 			  //If the result was a failure, send the top of the stack as the error code or reason
 			  printf("%i\n", vm_peek_ops(&vm_state));
 		  }
+	  } else if (buff[0] == '3') {
+
+		  //Read the pin configs into the state
+		  read_uart_into_buffer(pp_state.pin_configs, 16, '\n');
+
+		  //Apply the state
+		  pp_setup(&pp_state);
+
+
 	  }
 
 
