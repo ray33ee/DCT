@@ -98,12 +98,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "VM.md",
+                "file": "Bytecode file format.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "VM"
+              "title": "Bytecode file format"
             }
           }
         ],
@@ -143,7 +143,8 @@
             "state": {
               "type": "file-explorer",
               "state": {
-                "sortOrder": "alphabetical"
+                "sortOrder": "alphabetical",
+                "autoReveal": false
               },
               "icon": "lucide-folder-closed",
               "title": "Files"
@@ -267,12 +268,12 @@
   },
   "active": "b4a04b4ff283dd03",
   "lastOpenFiles": [
-    "Bytecode file format.md",
-    "VM.md",
-    "DCT.md",
-    "Stack based.md",
     "Circuit.md",
+    "DCT.md",
     "Interface.md",
+    "Stack based.md",
+    "VM.md",
+    "Bytecode file format.md",
     "Welcome.md"
   ]
 }

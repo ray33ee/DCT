@@ -74,8 +74,9 @@ static void MX_TIM3_Init(void);
 /* USER CODE BEGIN 0 */
 
 
-
+struct Executable_State exec_state;
 struct VM_State vm_state;
+struct PSU_STATE psu_state;
 
 uint32_t shunt_okay_average(struct PSU_STATE* psu_state) {
 	uint32_t sum = 0;
@@ -186,18 +187,13 @@ int main(void)
   uint32_t call_stack[call_stack_size];
   uint32_t operand_stack[operand_stack_size];
 
-  uint8_t rom[29] = {42, 6, 0, 0, 0, 200, 41, 0, 0, 0, 0, 60, 100, 0, 0, 0, 23, 60, 2, 0, 0, 0, 1, 203, 43, 0, 0, 0, 0, };
+  executable_init(&exec_state);
 
-  vm_init(&vm_state, call_stack, operand_stack, call_stack_size, operand_stack_size, rom, sizeof(rom));
+  vm_init(&vm_state, call_stack, operand_stack, call_stack_size, operand_stack_size, &exec_state);
 
-  /* Setup and test RNG */
+  /* Setup RNG */
 
   rng_global_init(&hrng);
-
-  printf("rng: %u\n", (unsigned int)rng_global_next32());
-  printf("rng: %u\n", (unsigned int)rng_global_next32());
-  printf("rng: %u\n", (unsigned int)rng_global_next32());
-  printf("rng: %u\n", (unsigned int)rng_global_next32());
 
   /* Setup and test soft I2C */
 
@@ -218,21 +214,9 @@ int main(void)
 
   printf("Soft i2c %i\n", who_am_i);*/
 
-  /* Test hard I2C */
-
-  /*HAL_StatusTypeDef reta = HAL_I2C_Master_Transmit(&hi2c1, 0x3c, &who_am_i, 1, 10);
-
-  HAL_StatusTypeDef retb = HAL_I2C_Master_Receive(&hi2c1, 0x3d, &who_am_i, 1, 10);
-
-  printf("main i2c: %i\n", reta);
-  printf("main i2c: %i\n", retb);
-  printf("whoami: %i\n", who_am_i);*/
-
-  struct PSU_STATE psu_state;
 
   psu_init(&psu_state, &hadc2, &hadc5, &htim2, &TIM2->CCR1, TIM_CHANNEL_1);
 
-  uint32_t values[1600];
 
   /* USER CODE END 2 */
 
@@ -244,33 +228,89 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  //vm_execute(&vm_state);
-
-	  printf("Enter pwm: \n");
 
 	  read_uart_into_buffer(buff, 100, '\n');
+
+	  if (buff[0] == '0') {
+		  get_length_from_uart(&exec_state);
+
+		  get_rom_from_uart(&exec_state);
+
+
+	  } else if (buff[0] == '1') {
+
+		  printf("%i\n", (int)vm_state.pc);
+		  printf("%i\n", (int)vm_state.osp);
+		  printf("%i\n", (int)vm_state.csp);
+		  printf("%i\n", (int)vm_state.exec->rom[vm_state.pc]);
+		  printf("%i\n", (int)vm_peek_ops(&vm_state));
+		  printf("%i\n", (int)vm_state.bp);
+
+	  } else if (buff[0] == '2') {
+		  uint32_t r = 0;
+
+		  vm_reset(&vm_state);
+
+		  while (r == 0) {
+			  r = vm_execute(&vm_state);
+		  }
+
+		  printf("done\n");
+
+		  printf("%i\n", r);
+
+		  if (r == FAILURE) {
+			  //If the result was a failure, send the top of the stack as the error code or reason
+			  printf("%i\n", vm_peek_ops(&vm_state));
+		  }
+	  }
+
+
+	  /*mcp23017_gpio(&u2, 0b01000000, 0xFFFF);
+
+
+	  HAL_Delay(1000);
+
+	  mcp23017_gpio(&u2, 0b01000000, 0);
+
+	  HAL_Delay(1000);
+
+
+	  printf("Donez\n");*/
+
+	  //vm_execute(&vm_state);
+
+	  //printf("Enter pwm: \n");
+
+	  //read_uart_into_buffer(buff, 100, '\n');
 
 	  //psu_intensity(&psu_state, atoi(buff));
 
 	  //printf("drop: %i\n", psu_shunt_diff(&psu_state));
 
-	  for (int i = 0; i < 1600; i++) {
+
+
+	  /*for (int i = 0; i < 1600; i++) {
 		  psu_intensity(&psu_state, i);
 
 		  HAL_Delay(1);
 
+		  voltages[i] = psu_output_voltage(&psu_state);
 
-
-		  //printf("value: %i\n", value);
-
-		  values[i] = shunt_okay_average(&psu_state); //psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state);
+		  values[i] = 4096 * 10 - (psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state)
+		  	  	  	  + psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state) + psu_shunt_diff(&psu_state));
 
 	  }
+
+	  psu_intensity(&psu_state, 0);
+
+	  HAL_Delay(20);
+
 
 	  for (int i = 0; i < 1600; i++) {
-		  printf("%i\n", values[i]);
+		  printf("%i %i %f\n", i, values[i], convert_adc_to_voltage(voltages[i]));
 
-	  }
+	  }*/
 
 
   }
@@ -344,7 +384,7 @@ static void MX_ADC2_Init(void)
   /** Common config
   */
   hadc2.Instance = ADC2;
-  hadc2.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV256;
+  hadc2.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
   hadc2.Init.Resolution = ADC_RESOLUTION_12B;
   hadc2.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc2.Init.GainCompensation = 0;
@@ -366,7 +406,7 @@ static void MX_ADC2_Init(void)
 
   /** Configure Regular Channel
   */
-  sConfig.Channel = ADC_CHANNEL_1;
+  sConfig.Channel = ADC_CHANNEL_3;
   sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
   sConfig.SingleDiff = ADC_DIFFERENTIAL_ENDED;

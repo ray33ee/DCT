@@ -9,7 +9,7 @@
 
 uint8_t __vm_fetch(struct VM_State* state) {
 	state->instruction_length = BYTECODE_OPCODE_LEN;
-	return state->rom[state->pc];
+	return state->exec->rom[state->pc];
 }
 
 void advance_pc(struct VM_State* state) {
@@ -17,9 +17,13 @@ void advance_pc(struct VM_State* state) {
 }
 
 uint32_t get_immediate(struct VM_State* state) {
-	uint32_t v = *(uint32_t*)&state->rom[state->pc + state->instruction_length];
+	uint32_t v = *(uint32_t*)&state->exec->rom[state->pc + state->instruction_length];
 	state->instruction_length += BYTECODE_IMMEDIATE_LEN;
 	return v;
+}
+
+uint32_t vm_peek_ops(struct VM_State* state) {
+	return state->operand_stack[state->osp];
 }
 
 /* Create a new VM */
@@ -29,28 +33,34 @@ void vm_init(
 		uint32_t* _operand_stack,
 		uint32_t _call_stack_size,
 		uint32_t _operand_stack_size,
-		uint8_t* _rom,
-		uint32_t _rom_size) {
+		struct Executable_State* _exec) {
+
 	state->call_stack = _call_stack;
 	state->operand_stack = _operand_stack;
 	state->call_stack_size = _call_stack_size;
 	state->operand_stack_size = _operand_stack_size;
-	state->rom = _rom;
-	state->rom_size = _rom_size;
+	state->exec = _exec;
+
+	vm_reset(state);
+}
+
+void vm_reset(struct VM_State* state) {
 	state->pc = 0;
 	state->bp = 0;
 	state->csp = -1;
 	state->osp = -1;
-
-
-
 }
 
 /* Execute the next instruction */
-void vm_execute(struct VM_State* state) {
+uint32_t vm_execute(struct VM_State* state) {
 
-	if (state->pc > state->rom_size) {
+
+	if (state->pc > state->exec->rom_length) {
 		//error
+	}
+
+	if (state->exec->rom_length == 0) {
+		//No code is loaded, error
 	}
 
 	uint8_t opcode = __vm_fetch(state);
@@ -366,7 +376,7 @@ void vm_execute(struct VM_State* state) {
 	    /* Misc */
 	    case 200: {//HALT
 
-	        printf("Halting\n");
+	        //printf("Halting\n");
 
 	      while (1) {
 	        HAL_Delay(1000);
@@ -374,22 +384,15 @@ void vm_execute(struct VM_State* state) {
 
 	      break;
 	    }
-	    case 202: {//SPEEK
-	      uint32_t peek = state->operand_stack[state->osp];
+	    case 201: {//SUC
 
-	      printf("Peek: %i\n", (int)peek);
-
-	      advance_pc(state);
+	    	return SUCCESS;
 
 	      break;
 	    }
-	    case 203: {//SPOP
-	      uint32_t top = state->operand_stack[state->osp];
-	      state->osp -= 1;
+	    case 202: {//FAIL
 
-	      printf("Pop: %i\n", (int)top);
-
-	      advance_pc(state);
+	    	return FAILURE;
 
 	      break;
 	    }
@@ -402,5 +405,6 @@ void vm_execute(struct VM_State* state) {
 	  }
 
 
+	return RUNNING;
 
 }

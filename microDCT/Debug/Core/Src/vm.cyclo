@@ -1,5 +1,7 @@
 ../Core/Src/vm.c:10:9:__vm_fetch	1
 ../Core/Src/vm.c:15:6:advance_pc	1
 ../Core/Src/vm.c:19:10:get_immediate	1
-../Core/Src/vm.c:26:6:vm_init	1
-../Core/Src/vm.c:50:6:vm_execute	40
+../Core/Src/vm.c:25:10:vm_peek_ops	1
+../Core/Src/vm.c:30:6:vm_init	1
+../Core/Src/vm.c:47:6:vm_reset	1
+../Core/Src/vm.c:55:10:vm_execute	40

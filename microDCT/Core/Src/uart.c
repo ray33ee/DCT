@@ -35,7 +35,7 @@ uint32_t read_uart_into_buffer(uint8_t* buffer, uint32_t buffer_size, uint8_t st
 		__HAL_UART_CLEAR_OREFLAG(&huart2);
 
 		HAL_UART_Receive(&huart2, buffer + count, 1, HAL_MAX_DELAY);
-		HAL_UART_Transmit(&huart2, buffer + count, 1, HAL_MAX_DELAY);
+		//HAL_UART_Transmit(&huart2, buffer + count, 1, HAL_MAX_DELAY);
 
 		if (buffer[count] == stop_character) {
 			buffer[count] = '\0';

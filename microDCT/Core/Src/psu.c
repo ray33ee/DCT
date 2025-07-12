@@ -60,7 +60,7 @@ uint32_t psu_shunt_diff(struct PSU_STATE* psu_handle) {
 }
 
 float convert_adc_to_voltage(uint32_t raw_adc) {
-	return (float)raw_adc / 4096.0 * 3.3;
+	return (float)raw_adc / 4096.0 * 5.0;
 }
 
 

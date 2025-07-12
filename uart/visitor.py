@@ -1,5 +1,7 @@
 
 import ast
+import symbols
+import symtable
 
 CONSTANTS = {
     "HIGH": 1,
@@ -17,16 +19,29 @@ BUILT_IN = {
     "pinMode": "setup",
     "serialSend": "spop",
     "serialPeek": "speek",
+    "success": "suc",
+    "fail": "fail",
     "bool": "bool",
 
 }
+
+def translate(source):
+    n = ast.parse(source)
+
+    m = symbols.get_map(source, n)
+
+    tr = Translator(m)
+
+    tr.visit(n)
+
+    return "\n".join(tr.code)
 
 
 class Translator(ast.NodeVisitor):
 
 
     def __init__(self, table):
-        self.code = ["    call @main", "    halt"]
+        self.code = ["    call @main", "    suc"]
         self.table = table
         self.context = None
 

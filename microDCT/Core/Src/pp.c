@@ -7,6 +7,8 @@
 
 #include "pp.h"
 
+//Convert to 5 arrays to prevent multiplications
+
 //Maps physical pins to their corresponding GS pins, HVS pins (both in MCP23017) and STM GPIO port/pin pair.
 //For each physical pin we have:
 //	MCP identifier (0 for U2 and 1 for U3)
@@ -45,14 +47,16 @@ void pp_init(struct PP_HANDLE* pp_handle, I2C_HandleTypeDef* hi2c) {
 	mcp23017_init(&pp_handle->u3_handle, MCP_U3_ADDR, hi2c);
 
 	//On startup, setup the device as though all pins are not connected. I.e. VCC off, GND off and STM GPIO as inputs
-	enum PIN_STATUS not_connected[] = {NC, NC, NC, NC, NC, NC, NC, NC, NC, NC, NC, NC, NC, NC, NC, NC, };
+	for (int i = 0; i < PP_COUNT; i++) {
+		pp_handle->pin_configs[i] = NC;
+	}
 
-	pp_setup(pp_handle, not_connected);
+	pp_setup(pp_handle);
 
 }
 
-/* Setup all physical pins as either input, output, vcc or gnd according to pin_configs */
-void pp_setup(struct PP_HANDLE* pp_handle, enum PIN_STATUS* pin_configs) {
+/* Setup all physical pins as either input, output, vcc or gnd according to pp_handle->pin_configs */
+void pp_setup(struct PP_HANDLE* pp_handle) {
 	//Loop over all 16 pins
 	//Extract relevant information via 'GS_HVS_SELECT_MAP'
 	//Setup GS and HVS bits
@@ -71,7 +75,7 @@ void pp_setup(struct PP_HANDLE* pp_handle, enum PIN_STATUS* pin_configs) {
 
 		GPIO_InitStruct.Pin = stm_gpio_pin;
 
-		if (pin_configs[i] == OUTPUT) {
+		if (pp_handle->pin_configs[i] == OUTPUT) {
 			//Set all outputs to 0 by default
 			HAL_GPIO_WritePin(stm_gpio_port, stm_gpio_pin, 0);
 
@@ -87,11 +91,11 @@ void pp_setup(struct PP_HANDLE* pp_handle, enum PIN_STATUS* pin_configs) {
 
 		HAL_GPIO_Init(stm_gpio_port, &GPIO_InitStruct);
 
-		if (pin_configs[i] == VCC) {
+		if (pp_handle->pin_configs[i] == VCC) {
 			uint32_t hvs_pin = GS_HVS_SELECT_MAP[i*5+2];
 
 			mcp_gpio_registers[mcp_index] |= 1 << hvs_pin;
-		} else if (pin_configs[i] == GND) {
+		} else if (pp_handle->pin_configs[i] == GND) {
 			uint32_t gs_pin = GS_HVS_SELECT_MAP[i*5+1];
 
 			mcp_gpio_registers[mcp_index] |= 1 << gs_pin;

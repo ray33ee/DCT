@@ -11,9 +11,14 @@
 #include "stdint.h"
 #include "stm32g4xx_hal.h"
 #include "rng.h"
+#include "executable.h"
 
 #define BYTECODE_OPCODE_LEN (1)
 #define BYTECODE_IMMEDIATE_LEN (4)
+
+#define RUNNING (0)
+#define SUCCESS (1)
+#define FAILURE (2)
 
 struct VM_State {
 	uint32_t* call_stack;
@@ -22,8 +27,7 @@ struct VM_State {
 	uint32_t call_stack_size;
 	uint32_t operand_stack_size;
 
-	uint8_t* rom;
-	uint32_t rom_size;
+	struct Executable_State* exec;
 
 	uint32_t instruction_length;
 
@@ -38,10 +42,13 @@ void vm_init(struct VM_State*,
 		uint32_t*,
 		uint32_t,
 		uint32_t,
-		uint8_t*,
-		uint32_t);
+		struct Executable_State*);
 
-void vm_execute(struct VM_State*);
+uint32_t vm_execute(struct VM_State*);
+
+uint32_t vm_peek_ops(struct VM_State*);
+
+void vm_reset(struct VM_State*);
 
 uint8_t fetch(struct VM_State*);
 

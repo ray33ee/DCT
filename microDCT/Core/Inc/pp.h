@@ -26,11 +26,13 @@ enum PIN_STATUS {
 struct PP_HANDLE {
 	MCP23017_HANDLE_TD u2_handle;
 	MCP23017_HANDLE_TD u3_handle;
+
+	enum PIN_STATUS pin_configs[PP_COUNT];
 };
 
 void pp_init(struct PP_HANDLE*, I2C_HandleTypeDef*);
 
-void pp_setup(struct PP_HANDLE*, enum PIN_STATUS*);
+void pp_setup(struct PP_HANDLE*);
 
 void pp_write(uint32_t, GPIO_PinState);
 

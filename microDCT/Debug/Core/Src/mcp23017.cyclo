@@ -1,2 +1,2 @@
-../Core/Src/mcp23017.c:12:6:mcp23017_init	1
-../Core/Src/mcp23017.c:29:6:mcp23017_gpio	1
+../Core/Src/mcp23017.c:12:6:mcp23017_init	3
+../Core/Src/mcp23017.c:31:6:mcp23017_gpio	2
