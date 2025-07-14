@@ -33,13 +33,15 @@ void vm_init(
 		uint32_t* _operand_stack,
 		uint32_t _call_stack_size,
 		uint32_t _operand_stack_size,
-		struct Executable_State* _exec) {
+		struct Executable_State* _exec,
+		struct PP_HANDLE* _pp) {
 
 	state->call_stack = _call_stack;
 	state->operand_stack = _operand_stack;
 	state->call_stack_size = _call_stack_size;
 	state->operand_stack_size = _operand_stack_size;
 	state->exec = _exec;
+	state->pp = _pp;
 
 	vm_reset(state);
 }
@@ -370,9 +372,27 @@ uint32_t vm_execute(struct VM_State* state) {
 	    /* GPIO */
 	    case 81: {//READ
 
+	    	uint32_t pin_number = state->operand_stack[state->osp];
+
+	    	uint32_t result = (uint32_t)pp_read(pin_number);
+
+	    	state->operand_stack[state->osp] = result;
+
+	        advance_pc(state);
+
 	    	break;
 	    }
 	    case 82: {//WRITE
+
+			uint32_t pin_level = state->operand_stack[state->osp];
+
+	        state->osp -= 1;
+
+	        uint32_t pin_number = state->operand_stack[state->osp];
+
+	        pp_write(pin_number, (GPIO_PinState)pin_level);
+
+	        advance_pc(state);
 
 	    	break;
 	    }

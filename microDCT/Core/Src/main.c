@@ -194,7 +194,7 @@ int main(void)
 
   executable_init(&exec_state);
 
-  vm_init(&vm_state, call_stack, operand_stack, call_stack_size, operand_stack_size, &exec_state);
+  vm_init(&vm_state, call_stack, operand_stack, call_stack_size, operand_stack_size, &exec_state, &pp_state);
 
   /* Setup RNG */
 
@@ -222,6 +222,7 @@ int main(void)
 
   psu_init(&psu_state, &hadc2, &hadc5, &htim2, &TIM2->CCR1, TIM_CHANNEL_1);
 
+  psu_intensity(&psu_state, 50);
 
   /* USER CODE END 2 */
 

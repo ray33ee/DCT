@@ -12,6 +12,7 @@
 #include "stm32g4xx_hal.h"
 #include "rng.h"
 #include "executable.h"
+#include "pp.h"
 
 #define BYTECODE_OPCODE_LEN (1)
 #define BYTECODE_IMMEDIATE_LEN (4)
@@ -35,6 +36,8 @@ struct VM_State {
 	uint32_t csp;
 	uint32_t osp;
 	uint32_t bp;
+
+	struct PP_HANDLE* pp;
 };
 
 void vm_init(struct VM_State*,
@@ -42,7 +45,8 @@ void vm_init(struct VM_State*,
 		uint32_t*,
 		uint32_t,
 		uint32_t,
-		struct Executable_State*);
+		struct Executable_State*,
+		struct PP_HANDLE*);
 
 uint32_t vm_execute(struct VM_State*);
 

@@ -37,6 +37,48 @@ const uint32_t GS_HVS_SELECT_MAP[] = {
 
 };
 
+const uint32_t MCP_MAP[] = { 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 };
+const uint32_t GS_PIN_MAP[] = { 1, 15, 3, 13, 5, 11, 7, 9, 1, 15, 3, 13, 11, 7, 9 };
+const uint32_t HVS_PIN_MAP[] = { 0, 14, 2, 12, 4, 10, 6, 8, 0, 14, 2, 12, 4, 10, 6, 8 };
+
+const GPIO_TypeDef* STM_GPIO_PORT_MAP[] = {
+	GPIOC,
+	GPIOB,
+	GPIOC,
+	GPIOC,
+	GPIOC,
+	GPIOB,
+	GPIOD,
+	GPIOB,
+	GPIOA,
+	GPIOB,
+	GPIOB,
+	GPIOB,
+	GPIOC,
+	GPIOB,
+	GPIOC,
+	GPIOB,
+};
+
+const uint32_t STM_GPIO_PIN_MAP[] = {
+	GPIO_PIN_10,
+	GPIO_PIN_9,
+	GPIO_PIN_11,
+	GPIO_PIN_5,
+	GPIO_PIN_12,
+	GPIO_PIN_8,
+	GPIO_PIN_2,
+	GPIO_PIN_11,
+	GPIO_PIN_4,
+	GPIO_PIN_10,
+	GPIO_PIN_0,
+	GPIO_PIN_15,
+	GPIO_PIN_2,
+	GPIO_PIN_14,
+	GPIO_PIN_3,
+	GPIO_PIN_5,
+};
+
 /* Setup MCP expanders and set all STM GPIO to inputs */
 void pp_init(struct PP_HANDLE* pp_handle, I2C_HandleTypeDef* hi2c) {
 
@@ -48,6 +90,8 @@ void pp_init(struct PP_HANDLE* pp_handle, I2C_HandleTypeDef* hi2c) {
 	for (int i = 0; i < PP_COUNT; i++) {
 		pp_handle->pin_configs[i] = NC;
 	}
+
+	pp_handle->pin_configs[0] = OUTPUT;
 
 	pp_setup(pp_handle);
 
@@ -109,16 +153,25 @@ void pp_setup(struct PP_HANDLE* pp_handle) {
 
 /* Write to a physical pin */
 void pp_write(uint32_t pp_number, GPIO_PinState state) {
-	GPIO_TypeDef* stm_gpio_port = (GPIO_TypeDef*)GS_HVS_SELECT_MAP[pp_number*5+3];
-	uint16_t stm_gpio_pin = GS_HVS_SELECT_MAP[pp_number*5+4];
+	GPIO_TypeDef* stm_gpio_port = STM_GPIO_PORT_MAP[pp_number];
+	uint16_t stm_gpio_pin = STM_GPIO_PIN_MAP[pp_number];
 
-	HAL_GPIO_WritePin(stm_gpio_port, stm_gpio_pin, state);
+	//HAL_GPIO_WritePin without the checks
+	if (state != GPIO_PIN_RESET)
+	{
+		stm_gpio_port->BSRR = (uint32_t)stm_gpio_pin;
+	}
+	else
+	{
+		stm_gpio_port->BRR = (uint32_t)stm_gpio_pin;
+	}
+
 }
 
 /* Read from a physical pin */
 GPIO_PinState pp_read(uint32_t pp_number) {
-	GPIO_TypeDef* stm_gpio_port = (GPIO_TypeDef*)GS_HVS_SELECT_MAP[pp_number*5+3];
-	uint16_t stm_gpio_pin = GS_HVS_SELECT_MAP[pp_number*5+4];
+	GPIO_TypeDef* stm_gpio_port = STM_GPIO_PORT_MAP[pp_number];
+	uint16_t stm_gpio_pin = STM_GPIO_PIN_MAP[pp_number];
 
 	return HAL_GPIO_ReadPin(stm_gpio_port, stm_gpio_pin);
 }

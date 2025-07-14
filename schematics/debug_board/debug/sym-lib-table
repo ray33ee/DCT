@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "NUCLEO-G474REc")(type "KiCad")(uri "E:/Software Projects/DCT/schematics/micro/NUCLEO-G474RE(3)/NUCLEO-G474REc.kicad_sym")(options "")(descr ""))
+)
