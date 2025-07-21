@@ -8,4 +8,4 @@
 ../Core/Src/vm.c:60:6:vm_set	1
 ../Core/Src/vm.c:67:6:vm_rst	1
 ../Core/Src/vm.c:73:6:vm_get	1
-../Core/Src/vm.c:82:10:vm_execute	96
+../Core/Src/vm.c:82:10:vm_execute	101

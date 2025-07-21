@@ -36,7 +36,7 @@ Core/Src/stm32g4xx_hal_msp.o: ../Core/Src/stm32g4xx_hal_msp.c \
  ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal_uart_ex.h \
  ../Core/Inc/vm.h ../Core/Inc/rng.h ../Core/Inc/executable.h \
  ../Core/Inc/uart.h ../Core/Inc/pp.h ../Core/Inc/mcp23017.h \
- ../Core/Inc/soft_i2c.h ../Core/Inc/psu.h
+ ../Core/Inc/vp.h ../Core/Inc/soft_i2c.h ../Core/Inc/psu.h
 ../Core/Inc/main.h:
 ../Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h:
 ../Core/Inc/stm32g4xx_hal_conf.h:
@@ -79,5 +79,6 @@ Core/Src/stm32g4xx_hal_msp.o: ../Core/Src/stm32g4xx_hal_msp.c \
 ../Core/Inc/uart.h:
 ../Core/Inc/pp.h:
 ../Core/Inc/mcp23017.h:
+../Core/Inc/vp.h:
 ../Core/Inc/soft_i2c.h:
 ../Core/Inc/psu.h:

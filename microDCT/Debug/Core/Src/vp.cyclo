@@ -1,0 +1,6 @@
+../Core/Src/vp.c:12:10:vp_get_state	1
+../Core/Src/vp.c:16:6:vp_set_state	1
+../Core/Src/vp.c:20:10:vp_get_pin_count	1
+../Core/Src/vp.c:24:11:vp_get_pins	1
+../Core/Src/vp.c:28:6:vp_write_port	3
+../Core/Src/vp.c:46:10:vp_read_port	3

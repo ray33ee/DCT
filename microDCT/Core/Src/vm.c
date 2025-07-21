@@ -408,6 +408,47 @@ uint32_t vm_execute(struct VM_State* state) {
 	        advance_pc(state);
 	        break;
 	    }
+	    case 65: {//PUSHG K
+	        uint32_t K = get_immediate(state);
+
+	        state->osp += 1;
+	        state->operand_stack[state->osp] = state->call_stack[K];
+
+	        advance_pc(state);
+
+	        break;
+	    }
+	    case 66: {//POPG K
+	        uint32_t K = get_immediate(state);
+
+	        state->call_stack[K] = state->operand_stack[state->osp];
+
+	        state->osp -= 1;
+
+
+
+	        advance_pc(state);
+	        break;
+	    }
+	    case 67: {//PUSHM K
+
+	    	//Virtual ports are represented by a pointer to the location in the stack that contains the information
+	    	//the the VP was constructed with.
+	    	// PUSHM constructs this pointer by subtracting the offset from the current stack pointer, and adds this
+	    	// pointer to the stack where it can be assigned to global variables.
+
+	        uint32_t K = get_immediate(state);
+
+	        //Get a pointer minus the K offset, which should give a pointer to the first data in the VP
+	        uint32_t* start = &state->operand_stack[state->osp-K];
+
+	        state->osp += 1;
+	        state->operand_stack[state->osp] = start;
+
+	        advance_pc(state);
+
+	        break;
+	    }
 
 	    /* GPIO */
 	    case 81: {//READ
@@ -437,6 +478,45 @@ uint32_t vm_execute(struct VM_State* state) {
 	        advance_pc(state);
 
 	    	break;
+	    }
+	    /* Virtual Ports */
+	    case 90: {//VPO
+
+
+
+
+
+			uint32_t* pointer = (uint32_t*)state->operand_stack[state->osp];
+
+	    	struct VP_DATA vp = { pointer };
+
+	        state->osp -= 1;
+
+	        uint32_t value = state->operand_stack[state->osp];
+
+	        state->osp -= 1;
+
+	        vp_write_port(&vp, value);
+
+
+
+	    	advance_pc(state);
+
+			break;
+	    }
+	    case 91: {//VPI
+	    	uint32_t* pointer = (uint32_t*)state->operand_stack[state->osp];
+
+	    	struct VP_DATA vp = { pointer };
+
+
+	    	state->operand_stack[state->osp] = vp_read_port(&vp);
+
+
+
+	    	advance_pc(state);
+
+			break;
 	    }
 	    /* Timing */
 	    case 100: {//DLA

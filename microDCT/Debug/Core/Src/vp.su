@@ -1,0 +1,6 @@
+../Core/Src/vp.c:12:10:vp_get_state	16	static
+../Core/Src/vp.c:16:6:vp_set_state	16	static
+../Core/Src/vp.c:20:10:vp_get_pin_count	16	static
+../Core/Src/vp.c:24:11:vp_get_pins	16	static
+../Core/Src/vp.c:28:6:vp_write_port	32	static
+../Core/Src/vp.c:46:10:vp_read_port	40	static

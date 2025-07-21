@@ -39,10 +39,17 @@ INSTRUCTION_OPCODES = {
     "pushl": 62,
     "popl": 63,
     "drop": 64,
+    "pushg": 65,
+    "popg": 66,
+    "pushm": 67,
 
     # GPIO
     "read": 81,
     "write": 82,
+
+    # Virtual Ports
+    "vpo": 90,
+    "vpi": 91,
 
     # Timing
     "dla": 100,

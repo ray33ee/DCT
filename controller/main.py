@@ -8,8 +8,7 @@ import json
 
 
 
-def send_source(source, timeout):
-    bs = compile(source)
+def send_bytecode(bs, timeout):
 
     ser.write(b"0\n")
 
@@ -120,20 +119,6 @@ def set_voltage(v):
 
 
 
-def test():
-    ser.write(b"5\n")
-
-    r = ser.readline()
-
-    print(r)
-
-    r = ser.readline()
-
-    print(r)
-
-    assert r == b"ack\n"
-
-
 s = """
 
 def main():
@@ -234,6 +219,57 @@ def main():
 
 """
 
+s = """
+
+def main():
+    pass
+
+"""
+
+s = """
+
+x = 8
+
+def main():
+    pass
+
+"""
+
+a = """
+    alloc 1
+ 	pushi 0
+ 	pushi 4
+ 	pushi 0
+ 	pushi 1
+ 	pushi 2
+ 	pushi 3
+ 	pushm 5
+ 	popg 0
+    call @main
+    suc
+main:
+    alloc 0
+    pushg 0
+    vpi
+    ret 0
+    
+"""
+
+s = """
+
+A = VPO([P1, P5, P9, P12, P8, P4], 0)
+Y = VPI([P3, P7, P11, P14, P10, P6], 0)
+
+def main():
+    start = 0
+    while start < 63:
+        A = start
+        if 63 - Y != start:
+            fail()
+        start = start + 1
+
+"""
+
 ser = serial.Serial("com3", 115200)
 
 NC = b"\x00"
@@ -244,22 +280,30 @@ GND = b"\x04"
 
 
 pins = [
-    OUTPUT, VCC,        # 1A    VCC
-    INPUT, OUTPUT,      # 1Y    6A
-    OUTPUT, INPUT,      # 2A    6Y
-    INPUT, OUTPUT,      # 2Y    5A
-    OUTPUT, INPUT,      # 3A    5Y
-    INPUT, OUTPUT,      # 3Y    4A
-    GND, INPUT,         # GND   4Y
-    NC, NC
+    OUTPUT, VCC,        #1  1A    VCC   2
+    INPUT, OUTPUT,      #3  1Y    6A    4
+    OUTPUT, INPUT,      #5  2A    6Y    6
+    INPUT, OUTPUT,      #7  2Y    5A    8
+    OUTPUT, INPUT,      #9  3A    5Y    10
+    INPUT, OUTPUT,      #11 3Y    4A    12
+    GND, INPUT,         #13 GND   4Y    14
+    NC, NC              #15             16
 
 ]
+
+from assembler import assemble
+from visitor import translate
+from compiler import compile
+
+bs = compile(s)
+
+
 
 setup_pins(b"".join(pins))
 
 set_voltage(1000)
 
-send_source(s, 5000)
+send_bytecode(bs, 5000)
 
 print("Run result: " + str(prettify_result(run())))
 

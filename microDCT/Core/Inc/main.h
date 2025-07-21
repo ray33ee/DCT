@@ -41,6 +41,7 @@ extern "C" {
 #include <stdio.h>
 #include "mcp23017.h"
 #include "executable.h"
+#include "vp.h"
 
 /* USER CODE END Includes */
 

@@ -33,9 +33,33 @@
 
  - Pins assigned to certain types will leek current (and increase ccurrent across shunt resistor)
 
+# Virtual Pins
+
+- Virutal pins are mostly implemented at the instruction level (we mmay need one more instruction to get the state of output values by storing the state and reading it)
+- Needs to be implemented by the high level language. 
+- If we assign to a VPO after initialisiation then we need to push the relevant index and v
+
 # Next steps
 
 - Voltage ramp up
 - Controller GUI
 - Virtual pins
 - Figure out why UART doesn't work on start
+- Add for loops of the simple form 
+
+```Python
+
+for i in 9:
+	pass
+
+```
+
+with a single loop variable and a constant number iterator.
+
+# Board 2
+
+When the current pins are in certain modes, they drive the HV above 0 even when the PWM is off (select all pins as VCC then turn off psu_intensity). 
+
+To solve this we can use transistors to cut off the 3.3 supply voltage (see simulations picX.txt for more info)
+
+BE WARNED! Make sure the 3.3v supply is turned ON when the psu voltage comes up or the level shifter will not work and 5v could be sent to the STM GPIO LINES!!!!

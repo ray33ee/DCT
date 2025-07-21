@@ -13,6 +13,7 @@
 #include "rng.h"
 #include "executable.h"
 #include "pp.h"
+#include "vp.h"
 
 #define BYTECODE_OPCODE_LEN (1)
 #define BYTECODE_IMMEDIATE_LEN (4)
@@ -43,6 +44,8 @@ struct VM_State {
 
 	uint32_t timeout;
 	uint32_t start_tick;
+
+	uint32_t global_count;
 
 	struct PP_HANDLE* pp;
 };

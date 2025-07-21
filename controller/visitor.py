@@ -92,11 +92,13 @@ BUILT_IN = {
 def translate(source):
     n = ast.parse(source)
 
-    m = symbols.get_map(source, n)
+    m, g, vpo, vpi = symbols.get_map(source, n)
 
     print(m)
 
-    tr = Translator(m)
+    print(g)
+
+    tr = Translator(m, g, vpo, vpi)
 
     tr.visit(n)
 
@@ -106,16 +108,35 @@ def translate(source):
 class Translator(ast.NodeVisitor):
 
 
-    def __init__(self, table):
-        self.code = ["    call @main", "    suc"]
+    def __init__(self, table, globalz, vpo, vpi):
+        self.code = [
+            f"    alloc {len(globalz)}",
+        ]
+
         self.table = table
+        self.globals = globalz
+        self.vpo = vpo
+        self.vpi = vpi
         self.context = None
 
+    def get_scope(self, identifier):
+
+        if identifier in self.globals:
+            return "g"
+        else:
+            return "l"
+
+
+
     def get_offset(self, identifier):
-        if identifier in self.table[self.context]["params"]:
-            index = -self.table[self.context]["params"][identifier]-2
-        elif identifier in self.table[self.context]["locals"]:
-            index = self.table[self.context]["locals"][identifier]+1
+
+        if identifier in self.globals:
+            index = self.globals[identifier]
+        elif  self.context is not None:
+            if identifier in self.table[self.context]["params"]:
+                index = -self.table[self.context]["params"][identifier]-2
+            elif identifier in self.table[self.context]["locals"]:
+                index = self.table[self.context]["locals"][identifier]+1
         else:
             print(f"Could not identify '{identifier}' in {self.context}")
             exit(-2)
@@ -141,6 +162,12 @@ class Translator(ast.NodeVisitor):
     # /* Declarations */
 
     def visit_FunctionDef(self, node):
+
+        if node.name == "main":
+            self.code += [
+             "    call @main",
+             "    suc"]
+
         self.push_label(node.name)
         self.push_instruction("alloc", [str(len(self.table[node.name]["locals"]))])
 
@@ -165,13 +192,25 @@ class Translator(ast.NodeVisitor):
         self.traverse(node.value)
         # Pop a value off the op stack and into each node.targets
 
-        for target in node.targets:
-            if type(target) is ast.Name:
-                index = self.get_offset(target.id)
-                self.push_instruction("popl", [str(index)])
-            else:
-                print(f"Invalud assignment target ({target})")
-                exit(-3)
+        if len(node.targets) != 1:
+            print(f"Chained assignment and unpacking not supported")
+            exit(-37)
+
+        if self.context is not None:
+            if node.targets[0].id in self.vpo:
+                self.push_instruction("pushg", [str(self.globals[node.targets[0].id])])
+                self.push_instruction("vpo")
+                return
+            elif node.targets[0].id in self.vpi:
+                print("Cannot assign to input")
+                exit(-37)
+
+        if type(node.targets[0]) is ast.Name:
+            index = self.get_offset(node.targets[0].id)
+            self.push_instruction("pop" + self.get_scope(node.targets[0].id), [str(index)])
+        else:
+            print(f"Invalud assignment target ({node.targets[0]})")
+            exit(-3)
 
     def visit_If(self, node):
         self.traverse(node.test)
@@ -211,7 +250,6 @@ class Translator(ast.NodeVisitor):
         # If the Expr is a call to a non-built in function, then drop the unused values from the stack
         if type(node.value) is ast.Call:
             if node.value.func.id not in BUILT_IN:
-                print(self.table[node.value.func.id]["return"])
                 for i in range(self.table[node.value.func.id]["return"]):
                     self.push_instruction("drop")
 
@@ -273,6 +311,25 @@ class Translator(ast.NodeVisitor):
     def visit_Call(self, node):
         assert type(node.func) is ast.Name
 
+        if node.func.id == "VPO" or node.func.id == "VPI":
+
+            pins = node.args[0]
+            state = node.args[1]
+
+            if not isinstance(state, ast.Constant):
+                print("State in virtual ports must be constant")
+                exit(-33)
+
+            self.push_instruction("pushi", [str(state.value)])
+            self.push_instruction("pushi", [str(len(pins.elts))])
+
+            self.traverse(node.args[0])
+
+            self.push_instruction("pushm", [str(len(pins.elts)+1)])
+
+
+            return
+
         if node.func.id in BUILT_IN:
             ins = BUILT_IN[node.func.id]
         else:
@@ -295,13 +352,23 @@ class Translator(ast.NodeVisitor):
 
     def visit_Name(self, node):
 
+        print(node.id)
+
+        if node.id in self.vpo:
+            print("Does not support getting state from vpo")
+            exit(-40)
+        elif node.id in self.vpi:
+            self.push_instruction("pushg", [str(self.globals[node.id])])
+            self.push_instruction("vpi")
+            return
+
         if node.id in CONSTANTS:
             self.push_instruction("pushi", [str(CONSTANTS[node.id])])
         else:
 
             index = self.get_offset(node.id)
 
-            self.push_instruction("pushl", [str(index)])
+            self.push_instruction("push" + self.get_scope(node.id), [str(index)])
 
     def visit_Constant(self, node):
         if isinstance(node.value, bool):

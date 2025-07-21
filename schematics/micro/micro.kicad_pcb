@@ -44832,7 +44832,7 @@
 			(justify left)
 		)
 	)
-	(gr_text "- Add vias to island on pin 2 of Q10\n- Add Test point for HV\n- Remove Test circuit (top right)"
+	(gr_text "- Add vias to island on pin 2 of Q10\n- Add Test point for HV\n- Remove Test circuit (top right)\n- Write on the front and back of the boards the CN7 and CN10 header names"
 		(at 191.000113 53 0)
 		(layer "Eco1.User")
 		(uuid "1d616f58-6aa6-4c05-a9db-6fc8aec55902")
