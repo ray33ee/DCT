@@ -219,10 +219,9 @@ int main(void)
 
   printf("Soft i2c %i\n", who_am_i);*/
 
-
   psu_init(&psu_state, &hadc2, &hadc5, &htim2, &TIM2->CCR1, TIM_CHANNEL_1);
 
-  psu_intensity(&psu_state, 50);
+  psu_intensity(&psu_state, 0);
 
   /* USER CODE END 2 */
 
@@ -238,9 +237,18 @@ int main(void)
 	  read_uart_into_buffer(buff, 100, '\n');
 
 	  if (buff[0] == '0') {
+
+		  read_uart_into_buffer(buff, 100, '\n');
+
+		  uint32_t timeout = atoi(buff);
+
+		  vm_state.timeout = timeout;
+
 		  get_length_from_uart(&exec_state);
 
 		  get_rom_from_uart(&exec_state);
+
+		  printf("ack\n");
 
 
 	  } else if (buff[0] == '1') {
@@ -249,13 +257,20 @@ int main(void)
 		  printf("%i\n", (int)vm_state.osp);
 		  printf("%i\n", (int)vm_state.csp);
 		  printf("%i\n", (int)vm_state.exec->rom[vm_state.pc]);
-		  printf("%i\n", (int)vm_peek_ops(&vm_state));
+		  if (vm_state.osp != -1) {
+			  printf("%i\n", (int)vm_peek_ops(&vm_state));
+		  }
 		  printf("%i\n", (int)vm_state.bp);
+
+
+		  printf("ack\n");
 
 	  } else if (buff[0] == '2') {
 		  uint32_t r = 0;
 
 		  vm_reset(&vm_state);
+
+		  vm_start_timer(&vm_state);
 
 		  while (r == 0) {
 			  r = vm_execute(&vm_state);
@@ -272,10 +287,25 @@ int main(void)
 	  } else if (buff[0] == '3') {
 
 		  //Read the pin configs into the state
-		  read_uart_into_buffer(pp_state.pin_configs, 16, '\n');
+		  read_uart_into_buffer(&(pp_state.pin_configs), 16, '\n');
 
 		  //Apply the state
 		  pp_setup(&pp_state);
+
+		  printf("ack\n");
+
+
+	  } else if (buff[0] == '4') {
+
+		  read_uart_into_buffer(buff, 100, '\n');
+
+		  uint32_t num = atoi(buff);
+
+		  psu_intensity(&psu_state, num);
+
+		  printf("%i\n", num);
+
+		  printf("ack\n");
 
 
 	  }
@@ -740,6 +770,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
+  __HAL_RCC_GPIOD_CLK_ENABLE();
 /* USER CODE END MX_GPIO_Init_2 */
 }
 

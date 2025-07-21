@@ -34,6 +34,10 @@ void pp_setup(struct PP_HANDLE*);
 
 void pp_write(uint32_t, GPIO_PinState);
 
+void pp_set(uint32_t);
+
+void pp_reset(uint32_t);
+
 GPIO_PinState pp_read(uint32_t);
 
 #endif /* INC_PP_H_ */

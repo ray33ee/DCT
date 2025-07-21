@@ -53,16 +53,56 @@ void vm_reset(struct VM_State* state) {
 	state->osp = -1;
 }
 
+void vm_start_timer(struct VM_State* state)  {
+	state->start_tick = HAL_GetTick();
+}
+
+void vm_set(struct VM_State* state, uint32_t pin) {
+	pp_set(pin);
+
+
+	advance_pc(state);
+}
+
+void vm_rst(struct VM_State* state, uint32_t pin) {
+	pp_reset(pin);
+
+	advance_pc(state);
+}
+
+void vm_get(struct VM_State* state, uint32_t pin) {
+	state->osp += 1;
+
+	state->operand_stack[state->osp] = pp_read(pin);
+
+	advance_pc(state);
+}
+
 /* Execute the next instruction */
 uint32_t vm_execute(struct VM_State* state) {
 
 
-	if (state->pc > state->exec->rom_length) {
+	if (state->pc >= state->exec->rom_length) {
 		//error
+		return PC_OVERLOW;
 	}
 
 	if (state->exec->rom_length == 0) {
 		//No code is loaded, error
+	}
+
+	if (state->osp > state->operand_stack_size - 10 && state->osp != -1) {
+		//If the OSP is close to the end of the op stack, raise a op stack overflow
+		return OP_STACK_OVERFLOW;
+	}
+
+	if (state->csp > state->call_stack_size - 10 && state->csp != -1) {
+		//If the csp is close to the end of the call stack, raise a call stack overflow
+		return CALL_STACK_OVERFLOW;
+	}
+
+	if (HAL_GetTick() - state->start_tick > state->timeout) {
+		return TIMEOUT_EXCEEDED;
 	}
 
 	uint8_t opcode = __vm_fetch(state);
@@ -390,6 +430,8 @@ uint32_t vm_execute(struct VM_State* state) {
 
 	        uint32_t pin_number = state->operand_stack[state->osp];
 
+	        state->osp -= 1;
+
 	        pp_write(pin_number, (GPIO_PinState)pin_level);
 
 	        advance_pc(state);
@@ -399,13 +441,223 @@ uint32_t vm_execute(struct VM_State* state) {
 	    /* Timing */
 	    case 100: {//DLA
 
-	      HAL_Delay(state->operand_stack[state->osp]);
+	    	uint32_t delay = state->operand_stack[state->osp];
+
+	      HAL_Delay(delay);
 	      state->osp -= 1;
 
 	      advance_pc(state);
 
 	      break;
 	    }
+	    case 101: {//DLB
+
+	    	uint32_t delay = state->operand_stack[state->osp];
+
+	    	misc_delay_us(delay);
+	      state->osp -= 1;
+
+	      advance_pc(state);
+
+	      break;
+	    }
+	    /* Set */
+	    case 111: { //SET1
+	    	vm_set(state, 0);
+	    	break;
+	    }
+	    case 112: { //SET2
+	    	vm_set(state, 1);
+	    	break;
+	    }
+	    case 113: { //SET3
+	    	vm_set(state, 2);
+	    	break;
+	    }
+	    case 114: { //SET4
+	    	vm_set(state, 3);
+	    	break;
+	    }
+	    case 115: { //SET5
+	    	vm_set(state, 4);
+	    	break;
+	    }
+	    case 116: { //SET6
+	    	vm_set(state, 5);
+	    	break;
+	    }
+	    case 117: { //SET7
+	    	vm_set(state, 6);
+	    	break;
+	    }
+	    case 118: { //SET8
+	    	vm_set(state, 7);
+	    	break;
+	    }
+	    case 119: { //SET9
+	    	vm_set(state, 8);
+	    	break;
+	    }
+	    case 120: { //SET10
+	    	vm_set(state, 9);
+	    	break;
+	    }
+	    case 121: { //SET11
+	    	vm_set(state, 10);
+	    	break;
+	    }
+	    case 122: { //SET12
+	    	vm_set(state, 11);
+	    	break;
+	    }
+	    case 123: { //SET13
+	    	vm_set(state, 12);
+	    	break;
+	    }
+	    case 124: { //SET14
+	    	vm_set(state, 13);
+	    	break;
+	    }
+	    case 125: { //SET15
+	    	vm_set(state, 14);
+	    	break;
+	    }
+	    case 126: { //SET16
+	    	vm_set(state, 15);
+	    	break;
+	    }
+	    /* Reset */
+
+	    case 141: { //RST1
+	    	vm_rst(state, 0);
+	    	break;
+	    }
+	    case 142: { //RST2
+	    	vm_rst(state, 1);
+	    	break;
+	    }
+	    case 143: { //RST3
+	    	vm_rst(state, 2);
+	    	break;
+	    }
+	    case 144: { //RST4
+	    	vm_rst(state, 3);
+	    	break;
+	    }
+	    case 145: { //RST5
+	    	vm_rst(state, 4);
+	    	break;
+	    }
+	    case 146: { //RST6
+	    	vm_rst(state, 5);
+	    	break;
+	    }
+	    case 147: { //RST7
+	    	vm_rst(state, 6);
+	    	break;
+	    }
+	    case 148: { //RST8
+	    	vm_rst(state, 7);
+	    	break;
+	    }
+	    case 149: { //RST9
+	    	vm_rst(state, 8);
+	    	break;
+	    }
+	    case 150: { //RST10
+	    	vm_rst(state, 9);
+	    	break;
+	    }
+	    case 151: { //RST11
+	    	vm_rst(state, 10);
+	    	break;
+	    }
+	    case 152: { //RST12
+	    	vm_rst(state, 11);
+	    	break;
+	    }
+	    case 153: { //RST13
+	    	vm_rst(state, 12);
+	    	break;
+	    }
+	    case 154: { //RST14
+	    	vm_rst(state, 13);
+	    	break;
+	    }
+	    case 155: { //RST15
+	    	vm_rst(state, 14);
+	    	break;
+	    }
+	    case 156: { //RST16
+	    	vm_rst(state, 15);
+	    	break;
+	    }
+	    /* Read */
+	    case 171: { //GET1
+	    	vm_get(state, 0);
+	    	break;
+	    }
+	    case 172: { //GET2
+	    	vm_get(state, 1);
+	    	break;
+	    }
+	    case 173: { //GET3
+	    	vm_get(state, 2);
+	    	break;
+	    }
+	    case 174: { //GET4
+	    	vm_get(state, 3);
+	    	break;
+	    }
+	    case 175: { //GET5
+	    	vm_get(state, 4);
+	    	break;
+	    }
+	    case 176: { //GET6
+	    	vm_get(state, 5);
+	    	break;
+	    }
+	    case 177: { //GET7
+	    	vm_get(state, 6);
+	    	break;
+	    }
+	    case 178: { //GET8
+	    	vm_get(state, 7);
+	    	break;
+	    }
+	    case 179: { //GET9
+	    	vm_get(state, 8);
+	    	break;
+	    }
+	    case 180: { //GET10
+	    	vm_get(state, 9);
+	    	break;
+	    }
+	    case 181: { //GET11
+	    	vm_get(state, 10);
+	    	break;
+	    }
+	    case 182: { //GET12
+	    	vm_get(state, 11);
+	    	break;
+	    }
+	    case 183: { //GET13
+	    	vm_get(state, 12);
+	    	break;
+	    }
+	    case 184: { //GET14
+	    	vm_get(state, 13);
+	    	break;
+	    }
+	    case 185: { //GET15
+	    	vm_get(state, 14);
+	    	break;
+	    }
+	    case 186: { //GET16
+	    	vm_get(state, 15);
+	    	break;
+	    }
+
 	    /* Misc */
 	    case 201: {//SUC
 

@@ -17,9 +17,13 @@
 #define BYTECODE_OPCODE_LEN (1)
 #define BYTECODE_IMMEDIATE_LEN (4)
 
-#define RUNNING (0)
-#define SUCCESS (1)
-#define FAILURE (2)
+#define RUNNING 				(0)
+#define SUCCESS 				(1)
+#define FAILURE 				(2)
+#define OP_STACK_OVERFLOW 		(3)
+#define CALL_STACK_OVERFLOW 	(4)
+#define TIMEOUT_EXCEEDED 		(5)
+#define PC_OVERLOW				(6) //Program pointer points beyond program memory
 
 struct VM_State {
 	uint32_t* call_stack;
@@ -37,6 +41,9 @@ struct VM_State {
 	uint32_t osp;
 	uint32_t bp;
 
+	uint32_t timeout;
+	uint32_t start_tick;
+
 	struct PP_HANDLE* pp;
 };
 
@@ -47,6 +54,8 @@ void vm_init(struct VM_State*,
 		uint32_t,
 		struct Executable_State*,
 		struct PP_HANDLE*);
+
+void vm_start_timer(struct VM_State*);
 
 uint32_t vm_execute(struct VM_State*);
 
@@ -59,6 +68,12 @@ uint8_t fetch(struct VM_State*);
 void advance_pc(struct VM_State*);
 
 uint32_t get_immediate(struct VM_State*);
+
+void vm_set(struct VM_State*, uint32_t);
+
+void vm_rst(struct VM_State*, uint32_t);
+
+void vm_get(struct VM_State*, uint32_t);
 
 
 #endif /* INC_VM_H_ */

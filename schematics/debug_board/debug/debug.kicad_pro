@@ -499,7 +499,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "",
+      "plot": "debug_gerbs/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "",

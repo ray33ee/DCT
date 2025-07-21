@@ -34,5 +34,15 @@ void get_rom_from_uart(struct Executable_State* executable) {
 
 	//If executable->rom is null, allocation failed
 
-	read_uart_into_buffer(executable->rom, executable->rom_length, '\n');
+	uint8_t buff[5];
+
+	for (uint32_t i = 0; i < executable->rom_length; i++) {
+		read_uart_into_buffer(buff, 5, '\n');
+
+		uint32_t byte = atoi(buff);
+
+		executable->rom[i] = (uint8_t)byte;
+	}
+
+
 }

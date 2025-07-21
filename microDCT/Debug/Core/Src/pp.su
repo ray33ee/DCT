@@ -1,4 +1,6 @@
-../Core/Src/pp.c:83:6:pp_init	24	static
-../Core/Src/pp.c:101:6:pp_setup	64	static
-../Core/Src/pp.c:155:6:pp_write	24	static
-../Core/Src/pp.c:172:15:pp_read	24	static
+../Core/Src/pp.c:81:6:pp_init	24	static
+../Core/Src/pp.c:97:6:pp_setup	64	static
+../Core/Src/pp.c:151:6:pp_write	16	static
+../Core/Src/pp.c:165:6:pp_set	24	static
+../Core/Src/pp.c:174:6:pp_reset	24	static
+../Core/Src/pp.c:183:15:pp_read	24	static

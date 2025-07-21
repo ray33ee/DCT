@@ -4,4 +4,8 @@
 ../Core/Src/vm.c:25:10:vm_peek_ops	16	static
 ../Core/Src/vm.c:30:6:vm_init	24	static
 ../Core/Src/vm.c:49:6:vm_reset	16	static
-../Core/Src/vm.c:57:10:vm_execute	96	static
+../Core/Src/vm.c:56:6:vm_start_timer	16	static
+../Core/Src/vm.c:60:6:vm_set	16	static
+../Core/Src/vm.c:67:6:vm_rst	16	static
+../Core/Src/vm.c:73:6:vm_get	16	static
+../Core/Src/vm.c:82:10:vm_execute	104	static
